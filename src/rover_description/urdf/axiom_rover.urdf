@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<robot name="axiom_rover" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Base Link -->
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="0.8 0.6 0.3"/>
+      </geometry>
+      <material name="blue">
+        <color rgba="0 0 0.8 1"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.8 0.6 0.3"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Winch Drum (Simplified) -->
+  <link name="winch_drum">
+    <visual>
+      <geometry>
+        <cylinder length="0.2" radius="0.05"/>
+      </geometry>
+      <material name="grey">
+        <color rgba="0.5 0.5 0.5 1"/>
+      </material>
+    </visual>
+  </link>
+
+  <joint name="winch_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="winch_drum"/>
+    <origin xyz="0.35 0 0.15" rpy="0 1.57 0"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <!-- Wheels would go here... -->
+
+</robot>
