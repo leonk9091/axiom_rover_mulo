@@ -1,76 +1,69 @@
-# Raccomandazioni Ingegneristiche - Rover "Mulo"
+# Raccomandazioni Ingegneristiche Avanzate - Rover "Mulo"
 
-Questo documento raccoglie le raccomandazioni tecniche e strategiche formulate dal Capo Ingegnere per migliorare l'affidabilità, la sicurezza e le prestazioni del rover.
+Questo documento raccoglie le raccomandazioni tecniche di alto livello, basate su letteratura scientifica e best practices industriali (IEEE, ICRA, ISO), per elevare l'affidabilità, la sicurezza e le prestazioni del rover a standard professionali e di ricerca avanzata.
 
 ---
 
-## 1. Software di Controllo (Winch & Stabilità)
+## 1. Controllo del Verricello: Da PID a Model Predictive Control (MPC)
 
 ### Criticità Attuale
-- La logica anti-ribaltamento è puramente reattiva e basata su soglie fisse.
-- Mancanza di considerazione della dinamica del momento ribaltante.
-- Assenza di filtraggio dei dati sensoriali, con rischio di falsi positivi/negativi.
+- L'uso di controller PID classici non gestisce adeguatamente le non-linearità del sistema (oscillazione del carico, elasticità del cavo).
+- Mancanza di vincoli espliciti sulla tensione massima e sulla velocità di variazione.
 
-### Raccomandazioni
-- **Controllo Adattivo:** Implementare un algoritmo che moduli la tensione del verricello in funzione dell'angolo di pitch e della velocità di variazione dello stesso.
-- **Filtraggio Dati:** Integrare filtri digitali (es. Kalman Filter o passa-basso) sui dati degli IMU per ridurre il rumore e migliorare la stabilità della stima.
-- **Modalità "Safe Winching":** Introdurre uno stato operativo che limiti automaticamente la velocità e la forza di trazione quando il rover si trova su pendenze critiche.
+### Raccomandazioni Scientifiche
+- **Non-linear Model Predictive Control (NMPC):** Abbandonare i PID a favore di un controllore predittivo che utilizzi un modello dinamico del sistema (rover + cavo + carico) per ottimizzare la traiettoria futura rispettando i vincoli fisici in tempo reale.
+- **Modellazione Eulero-Lagrange:** Utilizzare l'equazione di Eulero-Lagrange per descrivere accuratamente la dinamica del carico oscillante e l'accoppiamento con la dinamica del rover.
+- **Riferimento:** *IEEE Transactions on Robotics*, approcci utilizzati in sistemi di sollevamento autonomo e robotica spaziale.
 
 ---
 
-## 2. Gestione dell'Alimentazione Ibrida
+## 2. Stabilità e Prevenzione del Ribaltamento: ZMP e Margini Dinamici
 
 ### Criticità Attuale
-- La gestione del generatore a combustione interna (ICE) si basa su soglie di batteria statiche.
-- Nessuna previsione del carico futuro, con rischi di spegnimento improvviso sotto sforzo.
+- Il monitoraggio di angoli di rollio e beccheggio è insufficiente per dinamiche rapide o terreni irregolari.
+- Assenza di fusione sensoriale avanzata per la stima dello stato.
 
-### Raccomandazioni
-- **Load Balancing Predittivo:** Sviluppare un algoritmo che analizzi il trend di consumo corrente per avviare il generatore *prima* che la batteria scenda sotto la soglia critica.
-- **Watchdog Hardware:** Implementare un circuito di monitoraggio indipendente che verifichi lo stato del BMS e del generatore, capace di forzare uno stato sicuro in caso di malfunzionamento software.
-- **Gestione Termica:** Monitorare attivamente le temperature di batteria e generatore per derating dinamico della potenza.
-
----
-
-## 3. Architettura Meccanica e Tolleranze
-
-### Criticità Attuali
-- Giunti e alberi personalizzati presentano potenziali punti di concentrazione delle tensioni.
-- Rischi di vibrazioni indotte da disallineamenti minori non compensati.
-
-### Raccomandazioni
-- **Specifiche di Tolleranza:** Definire rigorosamente le tolleranze geometriche e dimensionali nei disegni tecnici (es. accoppiamenti ISO H7/g6 per alberi e mozzi).
-- **Compensazione Errori:** Sostituire giunti rigidi con giunti elastici o cardanici nelle trasmissioni di potenza per assorbire disallineamenti angolari e assiali.
-- **Monitoraggio Vibrazioni:** Installare accelerometri vicino ai supporti dei cuscinetti critici per la manutenzione predittiva e il rilevamento precoce di guasti meccanici.
+### Raccomandazioni Scientifiche
+- **Zero-Moment Point (ZMP) & Dynamic Stability Margin (DSM):** Calcolare in tempo reale il punto di momento nullo e il margine di stabilità dinamico per prevedere il ribaltamento prima che avvenga, considerando le forze di inerzia.
+- **Unscented Kalman Filter (UKF):** Integrare un UKF per fondere dati da IMU, odometria e sensori di forza, ottenendo una stima dello stato (posizione, velocità, orientamento) più robusta al rumore e alle non-linearità rispetto a un EKF classico.
+- **Riferimento:** Metodologie adottate da laboratori come JPL (NASA) ed ETH Zurich per rover planetari e robot bipedi.
 
 ---
 
-## 4. Sicurezza Funzionale (Functional Safety)
+## 3. Gestione Energetica Ibrida: Equivalent Consumption Minimization Strategy (ECMS)
 
 ### Criticità Attuale
-- L'arresto di emergenza e le protezioni dipendono interamente dallo stack software ROS, che può bloccarsi o latere.
+- La gestione del generatore ICE basata su soglie fisse è inefficiente e non ottimizza il consumo globale.
+- Stima dello stato della batteria (SoC/SoH) potenzialmente imprecisa sotto carichi variabili.
 
-### Raccomandazioni
-- **E-Stop Hardware Indipendente:** Realizzare un circuito di arresto emergency (categoria PLd/PLe) che interrompa fisicamente l'alimentazione dei motori, bypassando completamente il software.
-- **Watchdog Esterno:** Utilizzare un microcontrollore dedicato (es. Arduino/STM32 semplice) che monitori l'"heartbeat" del computer principale; in caso di silenzio, deve attivare l'E-Stop autonomamente.
-- **Fail-Safe Defaults:** Configurare i driver dei motori per entrare in modalità "freewheel" o frenatura attiva in caso di perdita del segnale di controllo.
+### Raccomandazioni Scientifiche
+- **Equivalent Consumption Minimization Strategy (ECMS):** Implementare questa strategia di controllo ottimo per determinare istantaneamente lo split di potenza ottimale tra batteria e generatore, minimizzando il consumo equivalente di carburante sull'intero ciclo operativo.
+- **Extended Kalman Filter (EKF) per BMS:** Utilizzare un EKF specifico per la stima congiunta di SoC (State of Charge) e SoH (State of Health), adattandosi ai cambiamenti dei parametri interni della batteria dovuti a temperatura e invecchiamento.
+- **Riferimento:** Letteratura consolidata su *Energy Management Systems (EMS)* per veicoli ibridi elettrici (HEV).
 
 ---
 
-## 5. Navigazione e Percezione
+## 4. Percezione e Navigazione: LiDAR-Inertial Odometry (LIO) e Terrain Analysis
 
 ### Criticità Attuale
-- Dipendenza esclusiva da telecamere (visione monoculare/stereo), vulnerabile a scarsa illuminazione, polvere o nebbia.
+- Dipendenza esclusiva da telecamere, vulnerabile a condizioni di scarsa illuminazione, polvere, nebbia o texture ripetitive.
+- Mancanza di adattamento alla cedevolezza del terreno.
 
-### Raccomandazioni
-- **Integrazione LiDAR:** Aggiungere un sensore LiDAR 2D o 3D per garantire la mappatura e l'evitamento ostacoli indipendentemente dalle condizioni di luce.
-- **Analisi del Terreno:** Sviluppare un modulo software che stimi la cedevolezza del terreno (slip ratio) basandosi sulla differenza tra velocità angolare delle ruote e velocità lineare stimata, per ottimizzare la distribuzione della coppia.
-- **Fusione Sensoriale:** Implementare un nodo di sensor fusion (es. `robot_localization`) che integri odometria, IMU, GPS (se disponibile) e dati exteroceptivi per una stima della posa robusta.
+### Raccomandazioni Scientifiche
+- **LiDAR-Inertial Odometry (LIO):** Adottare framework state-of-the-art come **LIO-SAM** o **FAST-LIO2** per una stima della posa (localizzazione) estremamente precisa e robusta, sfruttando la fusione stretta tra dati LiDAR e IMU.
+- **Classificazione del Terreno con Deep Learning:** Integrare reti neurali convoluzionali (CNN) o trasformers per classificare il terreno (sabbia, roccia, erba) da dati visivi o LiDAR, permettendo al controller di adattare i parametri di trazione e sospensione.
+- **Riferimento:** Conferenze top di settore come **ICRA** e **IROS**.
 
 ---
 
-## Piano d'Azione Prioritario
+## 5. Sicurezza Funzionale: Architettura Safety-Critical e ISO 13849
 
-1.  **Immediato:** Implementazione E-Stop hardware e Watchdog esterno (Sicurezza).
-2.  **Breve Termine:** Revisione delle tolleranze meccaniche e introduzione filtri nel controllo del verricello.
-3.  **Medio Termine:** Sviluppo algoritmo di gestione energetica predittiva e integrazione LiDAR.
-4.  **Lungo Termine:** Ottimizzazione avanzata della navigazione su terreni deformabili.
+### Criticità Attuale
+- Assenza di separazione tra dominio di controllo (ROS) e dominio di sicurezza.
+- Nessuna certificazione o approccio strutturato alla sicurezza funzionale.
+
+### Raccomandazioni Scientifiche
+- **Architettura Separata:** Isolare completamente le funzioni di sicurezza su un hardware dedicato (es. MCU real-time o FPGA) indipendente dal computer principale che esegue ROS.
+- **Safe Torque Off (STO):** Implementare circuiti hardware certificati (categoria PLd/PLe secondo ISO 13849-1) per interrompere fisicamente la coppia ai motori in caso di guasto, indipendentemente dallo stato del software.
+- **Watchdog e Heartbeat:** Utilizzare protocolli di comunicazione safety-rated e watchdog hardware per monitorare l'integrità del sistema di controllo.
+- **Riferimento:** Standard **ISO 13849-1** e **IEC 61508** per la sicurezza funzionale delle macchine.
