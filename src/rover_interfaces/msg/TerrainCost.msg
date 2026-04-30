@@ -1,0 +1,10 @@
+std_msgs/Header header
+string terrain_class
+float32 slope_rad
+float32 roughness
+float32 slip_risk
+float32 vegetation_density
+float32 traversability
+float32 confidence
+float32 recommended_speed_ms
+bool traversable

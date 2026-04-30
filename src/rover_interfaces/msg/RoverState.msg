@@ -1,0 +1,13 @@
+std_msgs/Header header
+string mode
+float32 linear_velocity_ms
+float32 angular_velocity_rads
+float32 average_wheel_speed_ms
+float32 slip_ratio
+float32 pitch_rad
+float32 roll_rad
+float32 battery_soc
+float32 stability_margin
+bool localization_ok
+bool drive_ready
+bool estop_active

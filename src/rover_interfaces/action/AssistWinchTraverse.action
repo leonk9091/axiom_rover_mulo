@@ -1,0 +1,12 @@
+string mode
+float32 target_tension_n
+float32 max_rover_speed_ms
+---
+bool success
+string result_message
+float32 peak_tension_n
+---
+float32 tension_n
+float32 stability_margin
+float32 rover_speed_ms
+string phase

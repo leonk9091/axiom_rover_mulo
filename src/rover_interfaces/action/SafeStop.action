@@ -1,0 +1,9 @@
+string reason
+bool hold_position
+---
+bool success
+string result_message
+---
+string phase
+bool motors_zeroed
+bool sto_requested

@@ -1,0 +1,8 @@
+std_msgs/Header header
+bool primary_link_up
+bool fallback_link_up
+float32 heartbeat_age_s
+float32 packet_loss_ratio
+float32 rssi_dbm
+string degraded_mode
+bool command_only_mode

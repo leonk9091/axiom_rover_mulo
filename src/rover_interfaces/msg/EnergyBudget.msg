@@ -1,0 +1,13 @@
+std_msgs/Header header
+string mission_mode
+float32 soc
+float32 soh
+float32 bus_voltage_v
+float32 battery_power_w
+float32 generator_power_w
+float32 power_reserve_w
+float32 mission_reserve_j
+float32 estimated_runtime_s
+float32 thermal_derate
+bool generator_active
+bool dump_load_active

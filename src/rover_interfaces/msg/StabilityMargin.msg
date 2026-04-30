@@ -1,0 +1,11 @@
+std_msgs/Header header
+float32 longitudinal_margin
+float32 lateral_margin
+float32 rollover_risk
+float32 traction_margin
+float32 margin
+float32 pitch_rad
+float32 roll_rad
+float32 safe_linear_velocity_ms
+float32 safe_winch_tension_n
+bool degraded

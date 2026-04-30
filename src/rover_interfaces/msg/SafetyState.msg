@@ -1,0 +1,9 @@
+std_msgs/Header header
+bool system_ok
+bool estop_active
+bool watchdog_ok
+bool sto_available
+bool link_healthy
+string degraded_mode
+string estop_reason
+string[] active_faults

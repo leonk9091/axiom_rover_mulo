@@ -1,0 +1,131 @@
+# config/rover_params.yaml
+# Parametri centralizzati Axiom Rover "Mulo"
+# Caricato da tutti i nodi al lancio tramite launch file
+
+# ---------------------------------------------------------------------------
+# Rover - Parametri fisici globali
+# ---------------------------------------------------------------------------
+rover:
+  mass_kg: 80.0
+  wheelbase_m: 0.8
+  track_width_m: 0.6
+  cog_height_m: 0.2
+  wheel_radius_m: 0.254
+  gear_ratio: 71.5
+  motor_pole_pairs: 7
+
+# ---------------------------------------------------------------------------
+# VESC Driver
+# ---------------------------------------------------------------------------
+vesc_driver:
+  ros__parameters:
+    can_interface: "can0"
+    max_linear_vel: 1.2          # m/s
+    max_angular_vel: 1.5         # rad/s
+    max_rpm_motor: 3000
+    max_current_a: 30.0
+    max_brake_current_a: 20.0
+    max_duty: 0.85
+    cmd_timeout_s: 0.5
+    telemetry_hz: 20
+    temp_motor_warn_c: 80.0
+    temp_motor_fault_c: 100.0
+    temp_esc_warn_c: 70.0
+    temp_esc_fault_c: 85.0
+    voltage_min_v: 20.0
+    voltage_max_v: 29.4
+
+# ---------------------------------------------------------------------------
+# Winch Manager
+# ---------------------------------------------------------------------------
+winch_manager:
+  ros__parameters:
+    tension_threshold_n: 500.0
+    tension_warn_n: 380.0
+    max_pitch_rad: 0.45
+    max_roll_rad: 0.35
+    safety_factor_zmp: 1.3
+    # PID tensione
+    kp_tension: 0.012
+    ki_tension: 0.003
+    kd_tension: 0.006
+    anti_windup_limit: 50.0
+    # Setpoint modalità
+    tension_passive_n: 30.0
+    tension_assisted_n: 200.0
+    tension_anchor_n: 420.0
+    # Modello cavo Eulero-Lagrange
+    cable_stiffness_k: 8000.0    # N/m
+    cable_damping_c: 120.0       # N·s/m
+    cable_mass_kg: 0.5
+    # Geometria
+    winch_height_m: 0.35
+    cog_height_m: 0.2
+    wheelbase_m: 0.8
+    track_width_m: 0.6
+
+# ---------------------------------------------------------------------------
+# Power Monitor (EKF + ECMS)
+# ---------------------------------------------------------------------------
+power_monitor:
+  ros__parameters:
+    # Batteria LiFePO4 24V
+    batt_capacity_ah: 30.0
+    batt_nominal_v: 24.0
+    batt_r0_ohm: 0.05
+    batt_r1_ohm: 0.02
+    batt_c1_f: 1500.0
+    # ICE Generator
+    ice_power_max_w: 800.0
+    ice_power_optimal_w: 500.0
+    ice_eta_optimal: 0.28
+    # ECMS
+    ecms_s0: 2.5
+    ecms_soc_ref: 0.60
+    ecms_soc_band: 0.15
+    ecms_lambda_adapt: 0.05
+    # Dump load
+    dump_load_soc_thresh: 0.95
+    dump_load_v_thresh: 28.5
+
+# ---------------------------------------------------------------------------
+# Person Following (Navigation)
+# ---------------------------------------------------------------------------
+person_following:
+  ros__parameters:
+    target_distance_m: 1.5
+    target_tolerance_m: 0.2
+    max_linear_vel: 1.0
+    max_angular_vel: 0.8
+    # PID lineare
+    kp_linear: 0.5
+    ki_linear: 0.02
+    kd_linear: 0.1
+    # PID angolare
+    kp_angular: 1.2
+    ki_angular: 0.01
+    kd_angular: 0.05
+    # UKF
+    ukf_alpha: 0.001
+    ukf_beta: 2.0
+    ukf_kappa: 0.0
+    # Terrain classifier
+    terrain_model_path: "models/terrain_classifier_mobilenetv3.pth"
+    terrain_confidence_threshold: 0.7
+
+# ---------------------------------------------------------------------------
+# Safety Watchdog
+# ---------------------------------------------------------------------------
+safety_watchdog:
+  ros__parameters:
+    heartbeat_period_s: 0.1
+    watchdog_check_period_s: 0.2
+    node_timeout_s: 1.0
+    esp32_timeout_s: 0.5
+    esp32_port: "/dev/ttyUSB0"
+    esp32_baud: 115200
+    critical_nodes:
+      - "winch_manager"
+      - "vesc_driver"
+      - "power_monitor"
+      - "person_following"

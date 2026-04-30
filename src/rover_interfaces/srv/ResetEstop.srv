@@ -1,0 +1,6 @@
+string reason        # motivo del reset (obbligatorio)
+bool   force         # true = forza reset anche con fault attivi
+---
+bool   success
+string message
+string[] remaining_faults

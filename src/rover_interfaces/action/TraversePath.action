@@ -1,0 +1,12 @@
+geometry_msgs/PoseStamped[] waypoints
+bool terrain_aware
+float32 cruise_speed_ms
+---
+bool success
+string result_message
+uint32 reached_waypoints
+---
+uint32 current_waypoint_index
+float32 remaining_distance_m
+float32 stability_margin
+string terrain_class

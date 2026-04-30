@@ -1,4 +1,3 @@
-```
 # Compiled and build artifacts
 *.pyc
 __pycache__/
@@ -12,6 +11,8 @@ __pycache__/
 dist/
 build/
 target/
+install/
+log/
 
 # Dependencies
 .venv/
@@ -69,4 +70,3 @@ htmlcov/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
-```

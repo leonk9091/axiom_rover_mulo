@@ -1,0 +1,7 @@
+std_msgs/Header header
+string mode
+float32 tension_setpoint_n
+float32 payout_velocity_ms
+float32 pull_velocity_ms
+bool allow_assist
+bool inhibit_motion

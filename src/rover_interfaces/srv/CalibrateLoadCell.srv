@@ -1,0 +1,6 @@
+float32 known_weight_n   # N - peso noto per calibrazione
+bool    tare_only        # true = solo tara, senza peso noto
+---
+bool    success
+float32 scale_factor
+string  message

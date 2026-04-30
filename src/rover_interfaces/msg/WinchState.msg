@@ -1,0 +1,11 @@
+std_msgs/Header header
+string mode
+float32 tension_measured_n
+float32 tension_estimated_n
+float32 tension_setpoint_n
+float32 cable_length_m
+float32 cable_velocity_ms
+float32 motor_duty
+float32 stability_margin
+bool stability_limited
+bool estop_active

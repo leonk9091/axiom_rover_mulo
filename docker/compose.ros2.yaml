@@ -1,0 +1,15 @@
+services:
+  mulo-x1-dev:
+    build:
+      context: ..
+      dockerfile: docker/ubuntu24.04/Dockerfile
+    image: mulo-x1:jazzy
+    network_mode: host
+    ipc: host
+    stdin_open: true
+    tty: true
+    volumes:
+      - ..:/workspaces/axiom_rover_ws
+    environment:
+      - ROS_DOMAIN_ID=42
+      - RMW_IMPLEMENTATION=rmw_fastrtps_cpp
