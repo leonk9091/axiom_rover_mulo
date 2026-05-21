@@ -10,7 +10,7 @@ Implementa:
 """
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import Twist, PoseStamped, PoseWithCovarianceStamped
+from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped, Twist, Vector3Stamped
 from sensor_msgs.msg import Image, PointCloud2, Imu
 from std_msgs.msg import Float32, String
 from nav_msgs.msg import Odometry
@@ -242,6 +242,7 @@ class PersonFollowingNode(Node):
 
         # --- Publishers ---
         self.cmd_vel_pub    = self.create_publisher(Twist, 'cmd_vel', 10)
+        self.leader_vector_pub = self.create_publisher(Vector3Stamped, 'mission/leader_vector', 10)
         self.terrain_pub    = self.create_publisher(String, 'navigation/terrain_type', 10)
         self.traction_pub   = self.create_publisher(Float32, 'navigation/traction_factor', 10)
         self.target_pose_pub = self.create_publisher(PoseStamped, 'navigation/target_pose', 10)
@@ -324,8 +325,11 @@ class PersonFollowingNode(Node):
         # 5. Calcola errore distanza e bearing
         if not self.person_detected:
             # Nessuna persona: stop
+            self._publish_leader_vector(0.0, 0.0, 0.0)
             self._publish_cmd_vel(0.0, 0.0)
             return
+
+        self._publish_leader_vector(self.person_range_m, self.person_bearing_rad, 1.0)
 
         distance_error = self.person_range_m - TARGET_DISTANCE_M
         bearing_error  = self.person_bearing_rad
@@ -367,6 +371,14 @@ class PersonFollowingNode(Node):
         twist.linear.x = v
         twist.angular.z = w
         self.cmd_vel_pub.publish(twist)
+
+    def _publish_leader_vector(self, range_m: float, bearing_rad: float, confidence: float):
+        msg = Vector3Stamped()
+        msg.header.stamp = self.get_clock().now().to_msg()
+        msg.vector.x = float(range_m)
+        msg.vector.y = float(bearing_rad)
+        msg.vector.z = float(confidence)
+        self.leader_vector_pub.publish(msg)
 
 
 def main(args=None):

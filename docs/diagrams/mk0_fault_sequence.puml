@@ -1,0 +1,31 @@
+@startuml
+title Axiom MK0 - Sequenza fault UWB e arresto conservativo
+
+actor Operatore
+participant "Tag UWB" as Tag
+participant "Anchor SX/DX" as Anchors
+participant "ESP32-S3\nState Machine" as MCU
+participant "VESC CAN" as VESC
+database "Micro-SD Log" as SD
+
+Operatore -> Tag: cammina davanti al rover
+Tag -> Anchors: ranging UWB
+Anchors -> MCU: d1, d2, timestamp
+MCU -> MCU: calcola target_distance / target_angle
+MCU -> VESC: drive_command limitato
+MCU -> SD: log FOLLOW
+
+== Degrado misura ==
+
+Tag -x Anchors: schermatura corpo / multipath
+Anchors -> MCU: misura assente o incoerente
+MCU -> MCU: valida timeout e plausibilita'
+MCU -> SD: fault_code = UWB_LOST
+MCU -> VESC: speed = 0, current_limit = 0
+MCU -> MCU: safety_state = STOP
+
+Operatore -> MCU: reset manuale dopo verifica
+MCU -> SD: evento RESET
+MCU -> MCU: ritorno IDLE
+
+@enduml

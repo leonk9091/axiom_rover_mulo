@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f2937"/>
+    </marker>
+    <style>
+      .sheet { fill: #f8fafc; }
+      .frame { fill: none; stroke: #111827; stroke-width: 2; }
+      .ground { stroke: #3f6212; stroke-width: 5; }
+      .chassis { fill: #d9e2ec; stroke: #1f2937; stroke-width: 3; }
+      .wheel { fill: #374151; stroke: #020617; stroke-width: 4; }
+      .hub { fill: #cbd5e1; stroke: #111827; stroke-width: 2; }
+      .sensor { fill: #dcfce7; stroke: #166534; stroke-width: 2; }
+      .rayLow { stroke: #f97316; stroke-width: 3; stroke-dasharray: 9 6; }
+      .rayHigh { stroke: #0ea5e9; stroke-width: 3; stroke-dasharray: 9 6; }
+      .dim { stroke: #1f2937; stroke-width: 2; marker-start: url(#arrow); marker-end: url(#arrow); }
+      .guide { stroke: #64748b; stroke-width: 1.5; stroke-dasharray: 8 6; }
+      .danger { fill: #fecaca; stroke: #991b1b; stroke-width: 3; }
+      .rock { fill: #a8a29e; stroke: #57534e; stroke-width: 3; }
+      .text { font-family: Arial, Helvetica, sans-serif; fill: #111827; font-size: 22px; }
+      .small { font-family: Arial, Helvetica, sans-serif; fill: #111827; font-size: 16px; }
+      .tiny { font-family: Arial, Helvetica, sans-serif; fill: #111827; font-size: 13px; }
+      .title { font-family: Arial, Helvetica, sans-serif; fill: #111827; font-size: 30px; font-weight: 700; }
+    </style>
+  </defs>
+
+  <rect class="sheet" x="0" y="0" width="1200" height="800"/>
+  <rect class="frame" x="35" y="35" width="1130" height="730"/>
+
+  <text class="title" x="60" y="80">Axiom MK0 - Vista laterale sensori ToF e ostacoli</text>
+  <text class="small" x="60" y="112">Schema di principio: soglie da validare con prove su terreno reale.</text>
+
+  <!-- Ground and rover -->
+  <line class="ground" x1="70" y1="640" x2="1130" y2="640"/>
+  <text class="tiny" x="82" y="625">terreno</text>
+  <rect class="chassis" x="240" y="375" width="430" height="88" rx="8"/>
+  <circle class="wheel" cx="330" cy="565" r="94"/>
+  <circle class="hub" cx="330" cy="565" r="22"/>
+  <circle class="wheel" cx="610" cy="565" r="94"/>
+  <circle class="hub" cx="610" cy="565" r="22"/>
+  <text class="tiny" x="260" y="680">ruota 20", raggio effettivo circa 255 mm</text>
+
+  <!-- Sensors on front -->
+  <rect class="sensor" x="665" y="535" width="52" height="28" rx="5"/>
+  <text class="tiny" x="671" y="554">ToF low</text>
+  <rect class="sensor" x="665" y="385" width="54" height="28" rx="5"/>
+  <text class="tiny" x="670" y="404">ToF high</text>
+  <text class="small" x="677" y="355">frontale rover</text>
+
+  <!-- Heights -->
+  <line class="dim" x1="745" y1="640" x2="745" y2="550"/>
+  <text class="small" x="758" y="600">10 cm</text>
+  <line class="dim" x1="790" y1="640" x2="790" y2="399"/>
+  <text class="small" x="803" y="525">25 cm</text>
+
+  <!-- Rays and obstacles -->
+  <line class="rayLow" x1="717" y1="550" x2="930" y2="565"/>
+  <line class="rayHigh" x1="719" y1="399" x2="965" y2="420"/>
+  <path class="rock" d="M875 640 L895 560 L945 540 L985 592 L1000 640 Z"/>
+  <line class="dim" x1="1030" y1="640" x2="1030" y2="540"/>
+  <text class="small" x="1043" y="595">15 cm</text>
+  <text class="tiny" x="875" y="526">ostacolo basso da testare</text>
+
+  <rect class="danger" x="1005" y="405" width="62" height="235" rx="4"/>
+  <text class="tiny" x="990" y="390">ostacolo alto</text>
+  <text class="tiny" x="1001" y="664">stop / aggira solo se validato</text>
+
+  <!-- Decision table -->
+  <rect x="75" y="165" width="435" height="160" rx="8" fill="#ffffff" stroke="#334155" stroke-width="2"/>
+  <text class="small" x="95" y="198">Logica conservativa v1</text>
+  <text class="tiny" x="95" y="230">Low libero + High libero  -> follow normale</text>
+  <text class="tiny" x="95" y="256">Low rileva + High libero  -> rallenta, log, test</text>
+  <text class="tiny" x="95" y="282">Low rileva + High rileva  -> STOP o manovra autorizzata</text>
+  <text class="tiny" x="95" y="308">Singola lettura anomala   -> conferma su piu' frame</text>
+
+  <rect x="610" y="165" width="500" height="120" rx="8" fill="#fff7ed" stroke="#9a3412" stroke-width="2"/>
+  <text class="small" x="632" y="198">Nota safety</text>
+  <text class="tiny" x="632" y="230">I ToF non sono safety assoluta outdoor:</text>
+  <text class="tiny" x="632" y="253">sole, fango, erba e superfici nere possono degradare la misura.</text>
+</svg>

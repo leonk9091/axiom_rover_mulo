@@ -1,0 +1,34 @@
+stateDiagram-v2
+    [*] --> INIT
+    INIT --> IDLE: sensori OK\nSD/CAN inizializzati
+    INIT --> STOP: init fault
+
+    IDLE --> FOLLOW: comando avvio\nUWB valido
+    IDLE --> ESTOP: E-stop fisico
+
+    FOLLOW --> DEGRADED: UWB rumoroso\nToF incerto\ntemp warning
+    FOLLOW --> STOP: perdita UWB\npendenza critica\nostacolo alto\nfault CAN
+    FOLLOW --> IDLE: pausa operatore
+    FOLLOW --> ESTOP: E-stop fisico
+
+    DEGRADED --> FOLLOW: misure stabili\nper N frame
+    DEGRADED --> STOP: timeout degrado\nfault persistente
+    DEGRADED --> IDLE: pausa operatore
+    DEGRADED --> ESTOP: E-stop fisico
+
+    STOP --> IDLE: reset fault\noperatore conferma
+    STOP --> ESTOP: E-stop fisico
+
+    ESTOP --> IDLE: rilascio E-stop\nreset manuale
+
+    note right of FOLLOW
+      drive_command limitato
+      target_distance / target_angle
+      logging continuo
+    end note
+
+    note right of STOP
+      velocita' = 0
+      corrente = 0
+      fault_code persistente
+    end note

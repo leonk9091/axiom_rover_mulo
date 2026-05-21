@@ -15,6 +15,27 @@ rover:
   motor_pole_pairs: 7
 
 # ---------------------------------------------------------------------------
+# Rover System (Hardware Bridge + State Estimation)
+# ---------------------------------------------------------------------------
+hardware_bridge:
+  ros__parameters:
+    serial_port: "/dev/ttyUSB0"
+    serial_baud: 115200
+    heartbeat_period_s: 0.1
+    publish_period_s: 0.1
+    serial_stale_s: 0.5
+    battery_stale_s: 1.5
+    link_stale_s: 1.5
+    thermal_headroom_default: 1.0
+    simulate_without_serial: true
+
+state_estimation:
+  ros__parameters:
+    publish_period_s: 0.05
+    stale_timeout_s: 1.0
+    smoothing_alpha: 0.2
+
+# ---------------------------------------------------------------------------
 # VESC Driver
 # ---------------------------------------------------------------------------
 vesc_driver:
@@ -121,11 +142,9 @@ safety_watchdog:
     heartbeat_period_s: 0.1
     watchdog_check_period_s: 0.2
     node_timeout_s: 1.0
-    esp32_timeout_s: 0.5
-    esp32_port: "/dev/ttyUSB0"
-    esp32_baud: 115200
     critical_nodes:
+      - "hardware_bridge"
       - "winch_manager"
       - "vesc_driver"
       - "power_monitor"
-      - "person_following"
+      - "state_estimation"

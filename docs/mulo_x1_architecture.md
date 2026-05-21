@@ -3,6 +3,17 @@
 ## Obiettivo
 Portare `Mulo` da prototipo ROS 2 a piattaforma R&D da trekking con autonomia condivisa, verricello assistito, supervisione energetica mission-aware e safety separata.
 
+## Decisione Hardware Trekking
+La base hardware X-1 approvata separa il cervello cognitivo dal sistema safety:
+
+- **Jetson Orin Nano Super 8GB** come computer di bordo iniziale per ROS 2, Nav2, percezione RGB, TensorRT e sensor fusion.
+- **STM32** come controller hard real-time per motori, watchdog, E-stop, ToF anti-caduta, IMU e stop indipendente.
+- **LiDAR 2D DToF orizzontale + camera RGB** per pseudo-3D economico: la camera classifica, il LiDAR fornisce distanza/angolo.
+- **ToF ST VL53L5CX/VL53L1X** per vuoti, gradini e zone cieche basse davanti alle ruote.
+- **Upgrade previsto a Jetson Orin NX 16GB** se AI, segmentazione terreno o modelli multipli saturano la Nano.
+
+Dettagli e razionale sono documentati in [`mulo_trekking_autonomy_hardware_decisions.md`](./mulo_trekking_autonomy_hardware_decisions.md).
+
 ## Domini
 - `control`: trazione, telemetria motori, stato rover.
 - `mission`: shared autonomy, follow leader, comandi alto livello.

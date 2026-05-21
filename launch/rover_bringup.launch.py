@@ -1,13 +1,15 @@
 """
 Launch file principale - Axiom Rover "Mulo"
 Avvia tutti i nodi nell'ordine corretto:
-  1. safety_watchdog  (primo: deve essere attivo prima di tutto)
-  2. stability_margin
-  2. vesc_driver
-  3. winch_manager
-  4. power_monitor
-  5. terrain_assessor
-  6. shared_autonomy
+  1. hardware_bridge   (primo: chiude il loop con ESP32/BMS/link raw)
+  2. safety_watchdog   (supervisione safety dopo bridge hardware)
+  3. stability_margin
+  4. vesc_driver
+  5. winch_manager
+  6. power_monitor
+  7. terrain_assessor
+  8. state_estimation
+  9. shared_autonomy
 
 Uso:
   ros2 launch rover_bringup rover_bringup.launch.py
@@ -67,22 +69,40 @@ def generate_launch_description():
     params_file = LaunchConfiguration('params_file')
 
     # ---------------------------------------------------------------------------
-    # Nodo 1: Safety Watchdog (avvio immediato, nessun delay)
+    # Nodo 1: Hardware Bridge (avvio immediato)
     # ---------------------------------------------------------------------------
-    safety_watchdog_node = Node(
-        package='rover_safety',
-        executable='safety_watchdog',
-        name='safety_watchdog',
+    hardware_bridge_node = Node(
+        package='rover_system',
+        executable='hardware_bridge',
+        name='hardware_bridge',
         output='screen',
         parameters=[params_file],
-        remappings=[],
-        # Priorità alta: respawn se crasha
         respawn=True,
         respawn_delay=1.0,
     )
 
     # ---------------------------------------------------------------------------
-    # Nodo 2: Stability Margin (delay 0.5s)
+    # Nodo 2: Safety Watchdog (delay 0.3s: attende bridge hardware)
+    # ---------------------------------------------------------------------------
+    safety_watchdog_node = TimerAction(
+        period=0.3,
+        actions=[
+            LogInfo(msg="[LAUNCH] Avvio Safety Watchdog..."),
+            Node(
+                package='rover_safety',
+                executable='safety_watchdog',
+                name='safety_watchdog',
+                output='screen',
+                parameters=[params_file],
+                remappings=[],
+                respawn=True,
+                respawn_delay=1.0,
+            )
+        ]
+    )
+
+    # ---------------------------------------------------------------------------
+    # Nodo 3: Stability Margin (delay 0.5s)
     # ---------------------------------------------------------------------------
     stability_margin_node = TimerAction(
         period=0.5,
@@ -101,7 +121,7 @@ def generate_launch_description():
     )
 
     # ---------------------------------------------------------------------------
-    # Nodo 3: VESC Driver (delay 1s: attende safety watchdog)
+    # Nodo 4: VESC Driver (delay 1s: attende safety watchdog)
     # ---------------------------------------------------------------------------
     vesc_driver_node = TimerAction(
         period=1.0,
@@ -120,7 +140,7 @@ def generate_launch_description():
     )
 
     # ---------------------------------------------------------------------------
-    # Nodo 4: Winch Manager (delay 2s)
+    # Nodo 5: Winch Manager (delay 2s)
     # ---------------------------------------------------------------------------
     winch_manager_node = TimerAction(
         period=2.0,
@@ -140,7 +160,7 @@ def generate_launch_description():
     )
 
     # ---------------------------------------------------------------------------
-    # Nodo 5: Power Monitor (delay 2s)
+    # Nodo 6: Power Monitor (delay 2s)
     # ---------------------------------------------------------------------------
     power_monitor_node = TimerAction(
         period=2.0,
@@ -159,7 +179,7 @@ def generate_launch_description():
     )
 
     # ---------------------------------------------------------------------------
-    # Nodo 6: Terrain Assessor (delay 2.5s, opzionale)
+    # Nodo 7: Terrain Assessor (delay 2.5s, opzionale)
     # ---------------------------------------------------------------------------
     terrain_assessor_node = TimerAction(
         period=2.5,
@@ -179,7 +199,26 @@ def generate_launch_description():
     )
 
     # ---------------------------------------------------------------------------
-    # Nodo 7: Shared Autonomy (delay 3s, opzionale)
+    # Nodo 8: State Estimation (delay 2.8s)
+    # ---------------------------------------------------------------------------
+    state_estimation_node = TimerAction(
+        period=2.8,
+        actions=[
+            LogInfo(msg="[LAUNCH] Avvio State Estimation..."),
+            Node(
+                package='rover_system',
+                executable='state_estimation',
+                name='state_estimation',
+                output='screen',
+                parameters=[params_file],
+                respawn=True,
+                respawn_delay=2.0,
+            )
+        ]
+    )
+
+    # ---------------------------------------------------------------------------
+    # Nodo 9: Shared Autonomy (delay 3s, opzionale)
     # ---------------------------------------------------------------------------
     shared_autonomy_node = TimerAction(
         period=3.0,
@@ -230,6 +269,7 @@ def generate_launch_description():
         # Log
         log_start,
         # Nodi (in ordine di priorità)
+        hardware_bridge_node,
         safety_watchdog_node,
         stability_margin_node,
         robot_state_publisher,
@@ -237,5 +277,6 @@ def generate_launch_description():
         winch_manager_node,
         power_monitor_node,
         terrain_assessor_node,
+        state_estimation_node,
         shared_autonomy_node,
     ])

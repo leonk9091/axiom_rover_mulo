@@ -17,6 +17,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/TerrainCost.msg"
   "msg/StabilityMargin.msg"
   "msg/EnergyBudget.msg"
+  "msg/FaultReport.msg"
+  "msg/HardwareState.msg"
   "msg/WinchCommand.msg"
   "msg/WinchState.msg"
   "msg/SafetyState.msg"

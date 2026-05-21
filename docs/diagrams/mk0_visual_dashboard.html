@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Axiom MK0 Visual Dashboard</title>
+  <style>
+    :root {
+      --ink: #111827;
+      --muted: #64748b;
+      --line: #cbd5e1;
+      --panel: #ffffff;
+      --bg: #f8fafc;
+      --blue: #075985;
+      --green: #166534;
+      --red: #991b1b;
+      --violet: #5b21b6;
+      --amber: #92400e;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+    }
+
+    header {
+      padding: 28px 34px 16px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 310px minmax(0, 1fr);
+      min-height: calc(100vh - 86px);
+    }
+
+    aside {
+      padding: 22px;
+      border-right: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .legend {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .legend div {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+    }
+
+    .swatch {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      border: 2px solid currentColor;
+    }
+
+    .blue { color: var(--blue); background: #e0f2fe; }
+    .green { color: var(--green); background: #dcfce7; }
+    .red { color: var(--red); background: #fee2e2; }
+    .violet { color: var(--violet); background: #ede9fe; }
+    .amber { color: var(--amber); background: #fff7ed; }
+
+    .facts {
+      display: grid;
+      gap: 10px;
+    }
+
+    .fact {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #f8fafc;
+    }
+
+    .fact strong {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .fact span {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    section {
+      padding: 24px;
+      display: grid;
+      gap: 18px;
+      align-content: start;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      min-height: 260px;
+    }
+
+    .panel h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .state {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .state span {
+      text-align: center;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 10px 6px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #f8fafc;
+    }
+
+    .equation {
+      font-family: Consolas, monospace;
+      background: #0f172a;
+      color: #e5e7eb;
+      padding: 14px;
+      border-radius: 8px;
+      line-height: 1.7;
+      overflow-x: auto;
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; }
+      aside { border-right: 0; border-bottom: 1px solid var(--line); }
+      .grid { grid-template-columns: 1fr; }
+      .state { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Axiom MK0 Visual Dashboard</h1>
+    <p>Pagina HTML autonoma per spiegare architettura, segnali e logica firmware del prototipo ESP32-S3.</p>
+  </header>
+  <main>
+    <aside>
+      <div class="legend">
+        <div><span class="swatch blue"></span> Controllo embedded</div>
+        <div><span class="swatch green"></span> Sensori e radio</div>
+        <div><span class="swatch violet"></span> Attuazione CAN/VESC</div>
+        <div><span class="swatch red"></span> Potenza e arresto</div>
+        <div><span class="swatch amber"></span> Safety e vincoli</div>
+      </div>
+      <div class="facts">
+        <div class="fact"><strong>Baseline UWB</strong><span>0,60 m</span></div>
+        <div class="fact"><strong>Distanza target</strong><span>1,50 m</span></div>
+        <div class="fact"><strong>ToF basso/alto</strong><span>10 / 25 cm</span></div>
+        <div class="fact"><strong>Loop firmware</strong><span>20 Hz</span></div>
+        <div class="fact"><strong>Regola base</strong><span>incertezza = stop</span></div>
+      </div>
+    </aside>
+
+    <section>
+      <div class="grid">
+        <article class="panel">
+          <h2>Follow-me UWB</h2>
+          <svg viewBox="0 0 520 280" aria-label="Geometria UWB semplificata">
+            <line x1="80" y1="230" x2="440" y2="230" stroke="#111827" stroke-width="3"/>
+            <line x1="260" y1="250" x2="260" y2="35" stroke="#111827" stroke-width="3"/>
+            <circle cx="140" cy="230" r="18" fill="#dcfce7" stroke="#166534" stroke-width="3"/>
+            <circle cx="380" cy="230" r="18" fill="#dcfce7" stroke="#166534" stroke-width="3"/>
+            <circle cx="305" cy="75" r="22" fill="#fee2e2" stroke="#991b1b" stroke-width="3"/>
+            <line x1="140" y1="230" x2="305" y2="75" stroke="#0ea5e9" stroke-width="3"/>
+            <line x1="380" y1="230" x2="305" y2="75" stroke="#22c55e" stroke-width="3"/>
+            <text x="105" y="265" font-size="13">Anchor SX</text>
+            <text x="345" y="265" font-size="13">Anchor DX</text>
+            <text x="330" y="70" font-size="13">Tag</text>
+            <text x="220" y="220" font-size="13">W = 0,60 m</text>
+          </svg>
+          <div class="equation">x = (d1^2 - d2^2) / (2W)<br>y = sqrt(d1^2 - (x + W/2)^2)<br>theta = atan2(x, y)</div>
+        </article>
+
+        <article class="panel">
+          <h2>State machine firmware</h2>
+          <svg viewBox="0 0 560 260" aria-label="State machine">
+            <defs>
+              <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+              </marker>
+            </defs>
+            <g fill="#e0f2fe" stroke="#075985" stroke-width="2">
+              <rect x="25" y="105" width="75" height="42" rx="7"/>
+              <rect x="125" y="105" width="75" height="42" rx="7"/>
+              <rect x="230" y="105" width="90" height="42" rx="7"/>
+              <rect x="350" y="105" width="100" height="42" rx="7"/>
+            </g>
+            <rect x="230" y="190" width="90" height="42" rx="7" fill="#fff7ed" stroke="#9a3412" stroke-width="2"/>
+            <rect x="465" y="105" width="75" height="42" rx="7" fill="#fee2e2" stroke="#991b1b" stroke-width="2"/>
+            <g font-size="13" font-weight="700" text-anchor="middle">
+              <text x="62" y="131">INIT</text><text x="162" y="131">IDLE</text><text x="275" y="131">FOLLOW</text>
+              <text x="400" y="131">DEGRADED</text><text x="275" y="216">STOP</text><text x="502" y="131">ESTOP</text>
+            </g>
+            <g stroke="#334155" stroke-width="2" fill="none" marker-end="url(#arr)">
+              <path d="M100 126 L125 126"/><path d="M200 126 L230 126"/><path d="M320 126 L350 126"/>
+              <path d="M400 147 C390 190 335 205 320 210"/><path d="M275 190 L275 147"/>
+              <path d="M450 126 L465 126"/><path d="M275 147 L275 190"/>
+            </g>
+          </svg>
+          <div class="state">
+            <span>INIT</span><span>IDLE</span><span>FOLLOW</span><span>DEGRADED</span><span>STOP</span><span>ESTOP</span>
+          </div>
+        </article>
+      </div>
+
+      <div class="grid">
+        <article class="panel">
+          <h2>Priorita' segnali</h2>
+          <svg viewBox="0 0 560 250" aria-label="Priorita segnali">
+            <rect x="215" y="72" width="130" height="90" rx="10" fill="#e0f2fe" stroke="#075985" stroke-width="3"/>
+            <text x="280" y="110" text-anchor="middle" font-size="15" font-weight="700">ESP32-S3</text>
+            <text x="280" y="133" text-anchor="middle" font-size="12">state machine</text>
+            <g font-size="13">
+              <rect x="35" y="25" width="115" height="38" rx="7" fill="#dcfce7" stroke="#166534" stroke-width="2"/><text x="92" y="49" text-anchor="middle">UWB</text>
+              <rect x="35" y="95" width="115" height="38" rx="7" fill="#dcfce7" stroke="#166534" stroke-width="2"/><text x="92" y="119" text-anchor="middle">ToF + IMU</text>
+              <rect x="35" y="165" width="115" height="38" rx="7" fill="#fff7ed" stroke="#9a3412" stroke-width="2"/><text x="92" y="189" text-anchor="middle">E-stop</text>
+              <rect x="410" y="65" width="115" height="48" rx="7" fill="#ede9fe" stroke="#5b21b6" stroke-width="2"/><text x="468" y="93" text-anchor="middle">VESC CAN</text>
+              <rect x="410" y="145" width="115" height="48" rx="7" fill="#fee2e2" stroke="#991b1b" stroke-width="2"/><text x="468" y="173" text-anchor="middle">STOP</text>
+            </g>
+            <g stroke="#334155" stroke-width="2.5" marker-end="url(#arr)">
+              <line x1="150" y1="44" x2="215" y2="93"/><line x1="150" y1="114" x2="215" y2="117"/><line x1="150" y1="184" x2="215" y2="145"/>
+              <line x1="345" y1="105" x2="410" y2="89"/><line x1="345" y1="145" x2="410" y2="169"/>
+            </g>
+          </svg>
+        </article>
+
+        <article class="panel">
+          <h2>Regola progettuale</h2>
+          <p style="font-size:18px; line-height:1.45; margin: 12px 0 0;">
+            MK0 deve vincere sulla prevedibilita': se UWB, ToF, IMU o CAN non sono coerenti, il firmware non cerca di essere intelligente. Riduce il comando, logga il motivo e ferma il rover.
+          </p>
+          <p style="font-size:16px; color:#64748b; line-height:1.45;">
+            Questa e' la differenza tra prototipo realmente collaudabile e autonomia fragile.
+          </p>
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

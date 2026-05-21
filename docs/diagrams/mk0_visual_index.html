@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Axiom MK0 - Indice Visuale</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --panel: #ffffff;
+      --ink: #111827;
+      --muted: #64748b;
+      --line: #cbd5e1;
+      --blue: #075985;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+    }
+
+    header {
+      padding: 28px 34px 18px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    main {
+      padding: 24px;
+      display: grid;
+      gap: 24px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .preview {
+      display: grid;
+      place-items: center;
+      min-height: 210px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .preview img,
+    .preview iframe {
+      width: 100%;
+      height: 260px;
+      border: 0;
+      object-fit: contain;
+      background: #fff;
+    }
+
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    a:hover { text-decoration: underline; }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      padding: 8px 12px;
+      border: 1px solid #bae6fd;
+      border-radius: 7px;
+      background: #e0f2fe;
+      font-size: 14px;
+    }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      padding: 14px;
+      min-height: 210px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0f172a;
+      color: #e5e7eb;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Axiom MK0 - Indice Visuale Cliccabile</h1>
+    <p>Pagina locale con link diretti a tavole SVG, dashboard HTML e sorgenti per diagrammi Mermaid, PlantUML e Graphviz.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Tavole grafiche</h2>
+      <div class="grid">
+        <article class="card">
+          <h2>Layout dall'alto</h2>
+          <a class="preview" href="mk0_top_layout.svg"><img src="mk0_top_layout.svg" alt="Layout dall'alto MK0"></a>
+          <div class="links"><a class="button" href="mk0_top_layout.svg">Apri SVG</a></div>
+        </article>
+
+        <article class="card">
+          <h2>Geometria UWB</h2>
+          <a class="preview" href="mk0_uwb_geometry.svg"><img src="mk0_uwb_geometry.svg" alt="Geometria UWB MK0"></a>
+          <div class="links"><a class="button" href="mk0_uwb_geometry.svg">Apri SVG</a></div>
+        </article>
+
+        <article class="card">
+          <h2>ToF e ostacoli</h2>
+          <a class="preview" href="mk0_side_tof_obstacle.svg"><img src="mk0_side_tof_obstacle.svg" alt="Vista laterale ToF MK0"></a>
+          <div class="links"><a class="button" href="mk0_side_tof_obstacle.svg">Apri SVG</a></div>
+        </article>
+
+        <article class="card">
+          <h2>Controllo e cablaggio</h2>
+          <a class="preview" href="mk0_control_wiring.svg"><img src="mk0_control_wiring.svg" alt="Controllo e cablaggio MK0"></a>
+          <div class="links"><a class="button" href="mk0_control_wiring.svg">Apri SVG</a></div>
+        </article>
+
+        <article class="card">
+          <h2>Ponte corazzato esploso</h2>
+          <a class="preview" href="mk0_exploded_drivetrain.svg"><img src="mk0_exploded_drivetrain.svg" alt="Vista esplosa ponte corazzato MK0"></a>
+          <div class="links"><a class="button" href="mk0_exploded_drivetrain.svg">Apri SVG</a></div>
+        </article>
+
+        <article class="card">
+          <h2>Dashboard HTML</h2>
+          <a class="preview" href="mk0_visual_dashboard.html"><iframe src="mk0_visual_dashboard.html" title="Dashboard visuale MK0"></iframe></a>
+          <div class="links"><a class="button" href="mk0_visual_dashboard.html">Apri dashboard</a></div>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>Sorgenti diagrammi</h2>
+      <div class="grid">
+        <article class="card">
+          <h2>Mermaid - State machine</h2>
+          <pre>stateDiagram-v2
+    [*] --> INIT
+    INIT --> IDLE: sensori OK
+    IDLE --> FOLLOW: comando avvio / UWB valido
+    FOLLOW --> DEGRADED: misura incerta
+    FOLLOW --> STOP: perdita UWB / fault CAN / pendenza critica
+    DEGRADED --> FOLLOW: misure stabili
+    STOP --> IDLE: reset manuale</pre>
+          <div class="links"><a class="button" href="mk0_firmware_state_machine.mmd">Apri .mmd</a></div>
+        </article>
+
+        <article class="card">
+          <h2>PlantUML - Sequenza fault</h2>
+          <pre>@startuml
+title Axiom MK0 - Sequenza fault UWB
+actor Operatore
+participant "Tag UWB" as Tag
+participant "ESP32-S3" as MCU
+participant "VESC CAN" as VESC
+database "Micro-SD Log" as SD
+@enduml</pre>
+          <div class="links"><a class="button" href="mk0_fault_sequence.puml">Apri .puml</a></div>
+        </article>
+
+        <article class="card">
+          <h2>Graphviz - Grafo segnali</h2>
+          <pre>digraph MK0SignalGraph {
+  rankdir=LR;
+  tag -> anchors -> mcu -> vesc;
+  tof -> mcu;
+  imu -> mcu;
+  estop -> mcu;
+  mcu -> sd;
+}</pre>
+          <div class="links"><a class="button" href="mk0_signal_graph.dot">Apri .dot</a></div>
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

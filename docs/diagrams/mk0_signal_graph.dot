@@ -1,0 +1,55 @@
+digraph MK0SignalGraph {
+  graph [
+    label="Axiom MK0 - Grafo segnali e priorita'",
+    labelloc=t,
+    fontsize=24,
+    fontname="Arial",
+    rankdir=LR,
+    bgcolor="#f8fafc"
+  ];
+
+  node [
+    shape=box,
+    style="rounded,filled",
+    fontname="Arial",
+    fontsize=14,
+    color="#334155",
+    fillcolor="#ffffff"
+  ];
+
+  edge [
+    fontname="Arial",
+    fontsize=12,
+    color="#1f2937"
+  ];
+
+  tag [label="Tag UWB\noperatore", fillcolor="#dcfce7", color="#166534"];
+  anchors [label="2x Anchor UWB\nfrontali", fillcolor="#dcfce7", color="#166534"];
+  tof [label="4x ToF\nfrontali", fillcolor="#dcfce7", color="#166534"];
+  imu [label="IMU\nroll/pitch", fillcolor="#dcfce7", color="#166534"];
+  gnss [label="GNSS\nlogging/geofence", fillcolor="#dcfce7", color="#166534"];
+  estop [label="E-stop fisico", fillcolor="#fff7ed", color="#9a3412"];
+
+  mcu [label="ESP32-S3\nstate machine + watchdog", fillcolor="#e0f2fe", color="#075985", penwidth=2.5];
+
+  vesc [label="VESC via CAN\nmotori SX/DX", fillcolor="#ede9fe", color="#5b21b6"];
+  brakes [label="Freni meccanici\nstazionamento", fillcolor="#fee2e2", color="#991b1b"];
+  sd [label="Micro-SD\nlog diagnostico", fillcolor="#ffffff", color="#334155"];
+  power [label="BMS / fusibili\nsezionatore", fillcolor="#fee2e2", color="#991b1b"];
+
+  tag -> anchors [label="ranging"];
+  anchors -> mcu [label="d1, d2"];
+  tof -> mcu [label="ostacoli"];
+  imu -> mcu [label="assetto"];
+  gnss -> mcu [label="posizione ausiliaria"];
+  estop -> mcu [label="priorita' massima", color="#dc2626", penwidth=2.5];
+  estop -> brakes [label="azione manuale", color="#dc2626", penwidth=2.5];
+
+  mcu -> vesc [label="drive_command", color="#7c3aed", penwidth=2.5];
+  vesc -> mcu [label="fault/corrente/temp", color="#7c3aed"];
+  mcu -> sd [label="target, state, fault"];
+  power -> vesc [label="24 V"];
+  power -> mcu [label="DC-DC isolato/protetto"];
+
+  mcu -> vesc [label="STOP su fault", color="#dc2626", penwidth=3];
+}

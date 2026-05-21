@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1f2937"/>
+    </marker>
+    <style>
+      .sheet { fill: #f8fafc; }
+      .frame { fill: none; stroke: #111827; stroke-width: 2; }
+      .metal { fill: #d9e2ec; stroke: #1f2937; stroke-width: 3; }
+      .plate { fill: #b8c4d1; stroke: #111827; stroke-width: 3; }
+      .wheel { fill: #111827; stroke: #020617; stroke-width: 3; }
+      .tire { fill: #374151; stroke: #020617; stroke-width: 3; }
+      .module { fill: #e0f2fe; stroke: #075985; stroke-width: 2; }
+      .power { fill: #fee2e2; stroke: #991b1b; stroke-width: 2; }
+      .sensor { fill: #dcfce7; stroke: #166534; stroke-width: 2; }
+      .dim { stroke: #1f2937; stroke-width: 2; marker-start: url(#arrow); marker-end: url(#arrow); }
+      .guide { stroke: #64748b; stroke-width: 1.5; stroke-dasharray: 8 6; }
+      .can { stroke: #7c3aed; stroke-width: 3; fill: none; stroke-dasharray: 10 5; }
+      .text { font-family: Arial, Helvetica, sans-serif; fill: #111827; font-size: 22px; }
+      .small { font-family: Arial, Helvetica, sans-serif; fill: #111827; font-size: 16px; }
+      .tiny { font-family: Arial, Helvetica, sans-serif; fill: #111827; font-size: 13px; }
+      .title { font-family: Arial, Helvetica, sans-serif; fill: #111827; font-size: 30px; font-weight: 700; }
+    </style>
+  </defs>
+
+  <rect class="sheet" x="0" y="0" width="1200" height="800"/>
+  <rect class="frame" x="35" y="35" width="1130" height="730"/>
+
+  <text class="title" x="60" y="80">Axiom MK0 - Layout dall'alto (schema concettuale)</text>
+  <text class="small" x="60" y="112">Vista top: posizioni funzionali, non tavola costruttiva. Quote non note da confermare su CAD.</text>
+
+  <!-- Rover chassis -->
+  <rect class="metal" x="340" y="170" width="520" height="185" rx="10"/>
+  <rect class="metal" x="340" y="445" width="520" height="185" rx="10"/>
+  <rect class="plate" x="545" y="355" width="110" height="90" rx="8"/>
+  <line class="guide" x1="600" y1="140" x2="600" y2="660"/>
+  <text class="small" x="665" y="405">snodo torsionale</text>
+  <text class="tiny" x="664" y="425">UCP204 + albero 20 mm</text>
+
+  <!-- Wheels -->
+  <ellipse class="tire" cx="270" cy="245" rx="52" ry="88"/>
+  <ellipse class="tire" cx="930" cy="245" rx="52" ry="88"/>
+  <ellipse class="tire" cx="270" cy="555" rx="52" ry="88"/>
+  <ellipse class="tire" cx="930" cy="555" rx="52" ry="88"/>
+  <text class="tiny" x="222" y="151">Ruota 20"</text>
+  <text class="tiny" x="894" y="151">Ruota 20"</text>
+  <text class="tiny" x="222" y="669">Ruota 20"</text>
+  <text class="tiny" x="894" y="669">Ruota 20"</text>
+
+  <!-- Armored bridge plates -->
+  <rect class="plate" x="315" y="207" width="55" height="76"/>
+  <rect class="plate" x="830" y="207" width="55" height="76"/>
+  <rect class="plate" x="315" y="517" width="55" height="76"/>
+  <rect class="plate" x="830" y="517" width="55" height="76"/>
+  <text class="tiny" x="115" y="245">ponte corazzato</text>
+  <line class="guide" x1="235" y1="242" x2="344" y2="242"/>
+
+  <!-- Electronics and power -->
+  <rect class="module" x="510" y="205" width="180" height="58" rx="6"/>
+  <text class="small" x="548" y="238">ESP32-S3</text>
+  <rect class="power" x="470" y="510" width="260" height="70" rx="6"/>
+  <text class="small" x="525" y="552">Batteria 24 V</text>
+  <rect class="power" x="390" y="292" width="122" height="44" rx="6"/>
+  <text class="tiny" x="407" y="319">VESC SX</text>
+  <rect class="power" x="688" y="292" width="122" height="44" rx="6"/>
+  <text class="tiny" x="705" y="319">VESC DX</text>
+
+  <!-- Front sensors and UWB anchors -->
+  <rect class="sensor" x="388" y="135" width="54" height="34" rx="5"/>
+  <text class="tiny" x="395" y="157">UWB L</text>
+  <rect class="sensor" x="758" y="135" width="54" height="34" rx="5"/>
+  <text class="tiny" x="765" y="157">UWB R</text>
+  <rect class="sensor" x="470" y="140" width="58" height="26" rx="5"/>
+  <text class="tiny" x="480" y="158">ToF LL</text>
+  <rect class="sensor" x="535" y="140" width="58" height="26" rx="5"/>
+  <text class="tiny" x="545" y="158">ToF HL</text>
+  <rect class="sensor" x="607" y="140" width="58" height="26" rx="5"/>
+  <text class="tiny" x="617" y="158">ToF HR</text>
+  <rect class="sensor" x="672" y="140" width="58" height="26" rx="5"/>
+  <text class="tiny" x="682" y="158">ToF LR</text>
+  <text class="small" x="532" y="132">Fronte rover</text>
+
+  <!-- Anchor baseline dimension -->
+  <line class="dim" x1="415" y1="100" x2="785" y2="100"/>
+  <line class="guide" x1="415" y1="100" x2="415" y2="135"/>
+  <line class="guide" x1="785" y1="100" x2="785" y2="135"/>
+  <text class="small" x="515" y="92">baseline UWB W = 0,60 m</text>
+
+  <!-- CAN dashed backbone -->
+  <path class="can" d="M600 234 C520 275 470 285 450 292"/>
+  <path class="can" d="M600 234 C680 275 730 285 750 292"/>
+  <path class="can" d="M450 336 C360 410 335 515 342 555"/>
+  <path class="can" d="M750 336 C840 410 865 515 858 555"/>
+  <text class="tiny" x="768" y="380">CAN bus VESC</text>
+
+  <!-- Notes -->
+  <rect x="72" y="700" width="1058" height="38" fill="#fff7ed" stroke="#9a3412" stroke-width="1.5"/>
+  <text class="small" x="90" y="724">Nota: schema per visualizzazione architetturale. Interassi, passo e ingombri finali vanno derivati dal CAD e dai componenti reali.</text>
+</svg>
