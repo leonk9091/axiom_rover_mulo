@@ -9,6 +9,138 @@ def clamp(value: float, low: float, high: float) -> float:
     return max(low, min(high, value))
 
 
+def crc16_ccitt_false(data: bytes) -> int:
+    """Compute CRC-16/CCITT-FALSE for MCU command/status frames."""
+    crc = 0xFFFF
+    for byte in data:
+        crc ^= byte << 8
+        for _ in range(8):
+            if crc & 0x8000:
+                crc = ((crc << 1) ^ 0x1021) & 0xFFFF
+            else:
+                crc = (crc << 1) & 0xFFFF
+    return crc
+
+
+def safety_command_crc_input(payload: dict) -> bytes:
+    """Return the canonical byte string used for SafetyCommand CRC."""
+    fields = [
+        ("seq", str(int(payload["seq"]))),
+        ("stamp_ms", str(int(payload["stamp_ms"]))),
+        ("mode", str(payload["mode"])),
+        ("desired_linear_velocity_ms", f"{float(payload['desired_linear_velocity_ms']):.3f}"),
+        ("desired_angular_velocity_rads", f"{float(payload['desired_angular_velocity_rads']):.3f}"),
+        ("timeout_ms", str(int(payload["timeout_ms"]))),
+        ("estop_request", "1" if payload["estop_request"] else "0"),
+        ("enable_motors_request", "1" if payload["enable_motors_request"] else "0"),
+        ("max_current_a", f"{float(payload['max_current_a']):.3f}"),
+    ]
+    return ";".join(f"{key}={value}" for key, value in fields).encode("ascii")
+
+
+def auxiliary_command_crc_input(payload: dict) -> bytes:
+    """Return the canonical byte string for auxiliary REX/dump-load commands."""
+    fields = [
+        ("seq", str(int(payload["seq"]))),
+        ("ice_on", "1" if payload.get("ice_on", False) else "0"),
+        ("ice_kill", "1" if payload.get("ice_kill", False) else "0"),
+        ("dump_load", "1" if payload.get("dump_load", False) else "0"),
+        ("rex_charge_current_a", f"{float(payload.get('rex_charge_current_a', 0.0)):.3f}"),
+        ("rex_throttle_request", f"{float(payload.get('rex_throttle_request', 0.0)):.3f}"),
+    ]
+    return ";".join(f"{key}={value}" for key, value in fields).encode("ascii")
+
+
+def build_safety_command_frame(
+    *,
+    seq: int,
+    stamp_ms: int,
+    mode: str,
+    desired_linear_velocity_ms: float,
+    desired_angular_velocity_rads: float,
+    timeout_ms: int,
+    estop_request: bool,
+    enable_motors_request: bool,
+    max_current_a: float,
+) -> dict:
+    """Build a deterministic Jetson/ROS -> safety MCU command frame."""
+    payload = {
+        "seq": int(seq) & 0xFFFFFFFF,
+        "stamp_ms": int(stamp_ms) & 0xFFFFFFFF,
+        "mode": str(mode),
+        "desired_linear_velocity_ms": float(desired_linear_velocity_ms),
+        "desired_angular_velocity_rads": float(desired_angular_velocity_rads),
+        "timeout_ms": int(clamp(timeout_ms, 50, 500)),
+        "estop_request": bool(estop_request),
+        "enable_motors_request": bool(enable_motors_request),
+        "max_current_a": float(clamp(max_current_a, 0.0, 30.0)),
+    }
+    payload["crc16"] = crc16_ccitt_false(safety_command_crc_input(payload))
+    return payload
+
+
+def add_auxiliary_command_crc(payload: dict) -> dict:
+    """Attach CRC for non-traction hardware commands in the heartbeat frame."""
+    payload["aux_crc16"] = crc16_ccitt_false(auxiliary_command_crc_input(payload))
+    return payload
+
+
+def mcu_status_crc_input(payload: dict) -> bytes:
+    """Return the canonical byte string used for MCU status CRC."""
+    seq_ack = payload.get("seq_ack", payload.get("ack", 0))
+    fields = [
+        ("seq_ack", str(int(seq_ack))),
+        ("mcu_uptime_ms", str(int(payload["mcu_uptime_ms"]))),
+        ("safety_state", str(payload["safety_state"])),
+        ("estop_active", "1" if payload["estop_active"] else "0"),
+        ("motor_consent", "1" if payload["motor_consent"] else "0"),
+        ("fault_code", str(payload["fault_code"])),
+        ("fault_latched", "1" if payload["fault_latched"] else "0"),
+        ("heartbeat_age_ms", str(int(payload["heartbeat_age_ms"]))),
+        ("sensor_validity", str(int(payload["sensor_validity"]))),
+        ("degraded_mode", str(payload["degraded_mode"])),
+        ("roll_rad", f"{float(payload['roll_rad']):.3f}"),
+        ("pitch_rad", f"{float(payload['pitch_rad']):.3f}"),
+        ("battery_voltage_v", f"{float(payload['battery_voltage_v']):.3f}"),
+        ("motor_current_a", f"{float(payload['motor_current_a']):.3f}"),
+    ]
+    return ";".join(f"{key}={value}" for key, value in fields).encode("ascii")
+
+
+def validate_mcu_status_payload(payload: dict, *, allow_unsigned: bool = False) -> tuple[bool, str]:
+    """Validate required fields and CRC for an MCU status payload."""
+    required_fields = (
+        "mcu_uptime_ms",
+        "safety_state",
+        "estop_active",
+        "motor_consent",
+        "fault_code",
+        "fault_latched",
+        "heartbeat_age_ms",
+        "sensor_validity",
+        "degraded_mode",
+        "roll_rad",
+        "pitch_rad",
+        "battery_voltage_v",
+        "motor_current_a",
+        "crc16",
+    )
+    if "seq_ack" not in payload and "ack" not in payload:
+        return False, "missing_seq_ack"
+    missing = [field for field in required_fields if field not in payload]
+    if missing:
+        return False, f"missing_{missing[0]}"
+
+    observed_crc = int(payload.get("crc16", 0))
+    if observed_crc == 0:
+        return (True, "unsigned_status_allowed") if allow_unsigned else (False, "unsigned_status")
+
+    expected_crc = crc16_ccitt_false(mcu_status_crc_input(payload))
+    if observed_crc != expected_crc:
+        return False, "status_crc_error"
+    return True, "ok"
+
+
 @dataclass(frozen=True)
 class HardwareSnapshot:
     bridge_connected: bool

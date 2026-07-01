@@ -1,0 +1,29 @@
+flowchart LR
+  Safety["Safety MCU / E-stop chain"] -->|"SAFETY_KILL_N active low"| REX["STM32 REX Controller"]
+  Host["Jetson / ROS hardware_bridge"] -->|"JSON aux command + aux_crc16"| REX
+  REX -->|"range status JSON"| Host
+
+  REX -->|"KILL_IGNITION"| Opto["Ignition opto / relay"]
+  Opto --> GX50["Honda GX50 ignition primary"]
+
+  REX -->|"THROTTLE_PWM"| Servo["Throttle servo driver"]
+  Servo --> Throttle["GX50 throttle linkage + spring return"]
+
+  RPM["Hall RPM sensor"] -->|"RPM_HALL"| REX
+  VDC["DC link divider + TVS"] -->|"VDC_ADC"| REX
+  ICHG["Charge current sensor"] -->|"ICHARGE_ANALOG"| REX
+  TEMP["Rectifier / buck / exhaust temp sensors"] -->|"ADC temps"| REX
+
+  BLDC["BLDC alternator U/V/W"] --> Rectifier["3-phase rectifier"]
+  Rectifier --> DCLINK["DC link caps 100 V min"]
+  DCLINK --> Buck["Buck CC/CV"]
+  Buck --> Ideal["Ideal diode / charge contactor"]
+  Ideal --> Battery["24 V LiFePO4 battery"]
+  REX -->|"DUMP_LOAD_REQ"| Dump["Dump/load controller"]
+
+  classDef safety fill:#f8d7da,stroke:#842029,color:#111;
+  classDef control fill:#d1e7dd,stroke:#0f5132,color:#111;
+  classDef power fill:#fff3cd,stroke:#664d03,color:#111;
+  class Safety,Opto safety;
+  class REX,Host,RPM,VDC,ICHG,TEMP control;
+  class GX50,Servo,Throttle,BLDC,Rectifier,DCLINK,Buck,Ideal,Battery,Dump power;

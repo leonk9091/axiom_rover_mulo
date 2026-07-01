@@ -26,3 +26,10 @@
 - [ ] Validazione tracciamento GPS ed esportazione automatica dei file GPX su SD card
 - [ ] Implementazione comando operatore Avanza/Stop per procedere lentamente sul percorso GPS registrato
 - [ ] Validazione coerenza GPS + odometria + IMU durante avanzamento assistito su traccia
+
+## Protezione Impermeabile — Interventi P0 Consigliati (Bassa Priorità)
+- [ ] Aggiungere guarnizione EPDM/silicone al vano batteria per portare il vano da IP54 a IP65 (~€15-30)
+- [ ] Installare fori di drenaggio con valvola sul fondo del vano batteria (~€5-10)
+- [ ] Installare tappi in silicone per i passacavi IP68 quando il rover non è in ricarica (~€5-10)
+
+> **Nota:** Il pacco batteria è già IP67 e il box elettronico è IP68. L'architettura a livelli multipli è sufficiente per trekking normale. Questi interventi migliorano la protezione del vano (IP54 → IP65) a costo minimo. Vedi [analisi completa](docs/analisi_copertura_impermeabile.md).

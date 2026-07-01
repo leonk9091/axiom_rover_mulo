@@ -16,6 +16,7 @@ L'ESP32 funge da interfaccia tra il computer di bordo (Jetson) e l'hardware di t
 | **Winch Encoder A** | GPIO 32 | Input (Pull-up) | Fase A encoder tamburo |
 | **Winch Encoder B** | GPIO 33 | Input (Pull-up) | Fase B encoder tamburo |
 | **Freno Emergenza (E-Stop)** | GPIO 14 | Input (Interr.) | Pulsante fisico a fungo |
+| **Motor Kill / Consenso Motori** | GPIO 26 | Output | Uscita separata active-high verso relay/opto consenso motori |
 | **Status LED (Progetto)** | GPIO 2 | Output | LED di bordo (Blink = OK) |
 
 ## 3. Comunicazione con Jetson

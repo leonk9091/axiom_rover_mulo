@@ -1,0 +1,12 @@
+hardware_bridge:
+  ros__parameters:
+    simulate_without_serial: true
+    allow_unsigned_mcu_status: true
+
+vesc_driver:
+  ros__parameters:
+    simulate_without_can: true
+
+power_monitor:
+  ros__parameters:
+    range_extender_enabled: false

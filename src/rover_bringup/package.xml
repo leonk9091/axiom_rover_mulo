@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>rover_bringup</name>
+  <version>1.0.0</version>
+  <description>Installable bringup launch package for Axiom Rover Mulo.</description>
+  <maintainer email="rover@axiom.local">Axiom Rover Team</maintainer>
+  <license>MIT</license>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>rover_control</exec_depend>
+  <exec_depend>rover_description</exec_depend>
+  <exec_depend>rover_navigation</exec_depend>
+  <exec_depend>rover_power</exec_depend>
+  <exec_depend>rover_safety</exec_depend>
+  <exec_depend>rover_system</exec_depend>
+  <exec_depend>rover_winch</exec_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>
+

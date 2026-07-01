@@ -1,0 +1,161 @@
+metadata:
+  title: MULO-REX Controller Harness
+  pn: MULO-REX-HARNESS-MK0
+  rev: A
+  date: 2026-06-14
+  notes: STM32 Nucleo REX controller harness. ESP32 documents are legacy only.
+
+connectors:
+  REX_CARRIER:
+    type: STM32 REX carrier internal terminals
+    pincount: 28
+    pinlabels:
+      - GND_SAFE
+      - SAFETY_KILL_N
+      - SAFETY_HEARTBEAT
+      - SHIELD_SAFE
+      - USB_5V
+      - USB_D-
+      - USB_D+
+      - GND_USB
+      - HONDA_IGN_PRIMARY
+      - HONDA_IGN_GND
+      - SERVO_6V
+      - GND_SERVO
+      - THROTTLE_PWM
+      - SENSOR_5V_RPM
+      - GND_RPM
+      - RPM_HALL
+      - DC_LINK_PLUS_SENSE
+      - DC_LINK_MINUS_SENSE
+      - SHIELD_VDC
+      - SENSOR_5V_ICHG
+      - GND_ICHG
+      - ICHARGE_ANALOG
+      - ICHARGE_FAULT
+      - RECTIFIER_TEMP
+      - BUCK_TEMP
+      - EXHAUST_ZONE_TEMP
+      - GND_TEMP
+      - DUMP_LOAD_REQ
+  J_SAFE:
+    type: sealed 4-pin safety input
+    pincount: 4
+    pinlabels: [GND, SAFETY_KILL_N, SAFETY_HEARTBEAT, SHIELD_DRAIN]
+  J_USB_SERIAL:
+    type: USB service lead
+    pincount: 4
+    pinlabels: [USB_5V, USB_D-, USB_D+, GND]
+  J_IGN:
+    type: sealed ignition kill lead
+    pincount: 2
+    pinlabels: [HONDA_IGN_PRIMARY, HONDA_IGN_GND]
+  J_SERVO:
+    type: sealed throttle servo lead
+    pincount: 3
+    pinlabels: [SERVO_6V, GND_SERVO, THROTTLE_PWM]
+  J_RPM:
+    type: sealed RPM Hall lead
+    pincount: 3
+    pinlabels: [SENSOR_5V, GND_SENSOR, RPM_HALL]
+  J_VDC:
+    type: shielded DC link sense lead
+    pincount: 3
+    pinlabels: [DC_LINK_PLUS_SENSE, DC_LINK_MINUS_SENSE, SHIELD_DRAIN]
+  J_ICHG:
+    type: shielded charge current sense lead
+    pincount: 4
+    pinlabels: [SENSOR_5V, GND_SENSOR, ICHARGE_ANALOG, ICHARGE_FAULT]
+  J_TEMP:
+    type: temperature harness
+    pincount: 4
+    pinlabels: [RECTIFIER_TEMP, BUCK_TEMP, EXHAUST_ZONE_TEMP, GND_SENSOR]
+  J_DUMP:
+    type: dump load request lead
+    pincount: 2
+    pinlabels: [DUMP_LOAD_REQ, GND]
+
+cables:
+  W_SAFE:
+    wirecount: 4
+    length: 0.6
+    colors: [BK, YE, BU, GN]
+    notes: twisted pair for SAFETY_KILL_N/HEARTBEAT, shield drain one end only
+  W_USB:
+    wirecount: 4
+    length: 0.4
+    colors: [RD, WH, GN, BK]
+    notes: service only, not safety path
+  W_IGN:
+    wirecount: 2
+    length: 0.8
+    colors: [YE, BK]
+    notes: high-temperature insulation near GX50
+  W_SERVO:
+    wirecount: 3
+    length: 0.7
+    colors: [RD, BK, WH]
+    notes: separate 6 V servo supply, strain relief mandatory
+  W_RPM:
+    wirecount: 3
+    length: 0.7
+    colors: [RD, BK, BU]
+    notes: shield/twist if EMI test fails
+  W_VDC:
+    wirecount: 3
+    length: 0.7
+    colors: [RD, BK, GN]
+    notes: high-impedance sense only, no power path
+  W_ICHG:
+    wirecount: 4
+    length: 0.5
+    colors: [RD, BK, WH, YE]
+    notes: shielded analog sense recommended
+  W_TEMP:
+    wirecount: 4
+    length: 0.8
+    colors: [VT, OG, GY, BK]
+    notes: exhaust sensor uses high-temperature sleeve
+  W_DUMP:
+    wirecount: 2
+    length: 0.5
+    colors: [BU, BK]
+    notes: request signal only, dump power handled externally
+
+connections:
+  -
+    - J_SAFE: [1, 2, 3, 4]
+    - W_SAFE: [1, 2, 3, 4]
+    - REX_CARRIER: [1, 2, 3, 4]
+  -
+    - J_USB_SERIAL: [1, 2, 3, 4]
+    - W_USB: [1, 2, 3, 4]
+    - REX_CARRIER: [5, 6, 7, 8]
+  -
+    - J_IGN: [1, 2]
+    - W_IGN: [1, 2]
+    - REX_CARRIER: [9, 10]
+  -
+    - J_SERVO: [1, 2, 3]
+    - W_SERVO: [1, 2, 3]
+    - REX_CARRIER: [11, 12, 13]
+  -
+    - J_RPM: [1, 2, 3]
+    - W_RPM: [1, 2, 3]
+    - REX_CARRIER: [14, 15, 16]
+  -
+    - J_VDC: [1, 2, 3]
+    - W_VDC: [1, 2, 3]
+    - REX_CARRIER: [17, 18, 19]
+  -
+    - J_ICHG: [1, 2, 3, 4]
+    - W_ICHG: [1, 2, 3, 4]
+    - REX_CARRIER: [20, 21, 22, 23]
+  -
+    - J_TEMP: [1, 2, 3, 4]
+    - W_TEMP: [1, 2, 3, 4]
+    - REX_CARRIER: [24, 25, 26, 27]
+  -
+    - J_DUMP: [1, 2]
+    - W_DUMP: [1, 2]
+    - REX_CARRIER: [28, 1]

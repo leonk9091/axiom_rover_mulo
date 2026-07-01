@@ -238,8 +238,8 @@ class WinchManagerNode(Node):
         self.cable_length    = msg.data
 
     def _cb_set_mode(self, msg: String):
-        new_mode = msg.data.lower()
-        if new_mode not in ("passive", "assisted", "anchor"):
+        new_mode = msg.data.lower().strip()
+        if new_mode not in ("passive", "assisted", "anchor", "leash"):
             self.get_logger().warn(f"Modalità sconosciuta: {new_mode}")
             return
         if self.estop_active:
@@ -250,6 +250,7 @@ class WinchManagerNode(Node):
             "passive": TENSION_PASSIVE_N,
             "assisted": TENSION_ASSISTED_N,
             "anchor": TENSION_ANCHOR_N,
+            "leash": 0.0,
         }.get(new_mode, TENSION_PASSIVE_N)
         self.pid.reset()
         self.cable_model.reset()
@@ -282,8 +283,6 @@ class WinchManagerNode(Node):
             return
 
         # 1. Aggiorna modello dinamico cavo
-        # La forza esterna è la forza applicata dal motore (stimata dal duty precedente)
-        # Qui usiamo la tensione misurata come feedback diretto al modello
         tension_model = self.cable_model.step(self.current_tension, CONTROL_DT)
         self.tension_est_pub.publish(Float32(data=float(tension_model)))
 
@@ -302,18 +301,22 @@ class WinchManagerNode(Node):
             return
 
         # 3. Seleziona setpoint tensione in base alla modalità
-        setpoint = min(self._get_tension_setpoint(effective_margin), self.external_safe_tension_n)
-        self.current_setpoint_n = setpoint
+        if self.current_mode == "leash":
+            setpoint = 0.0
+            duty = 0.0
+        else:
+            setpoint = min(self._get_tension_setpoint(effective_margin), self.external_safe_tension_n)
+            self.current_setpoint_n = setpoint
 
-        # 4. PID → duty cycle motore verricello [-1.0, +1.0]
-        duty = self.pid.compute(setpoint, self.current_tension)
-        duty = max(-1.0, min(1.0, duty))
+            # 4. PID → duty cycle motore verricello [-1.0, +1.0]
+            duty = self.pid.compute(setpoint, self.current_tension)
+            duty = max(-1.0, min(1.0, duty))
 
-        # 5. Riduzione preventiva se ZMP si avvicina al limite (margine < 0.3)
-        if effective_margin < 0.3:
-            scale = max(0.1, effective_margin / 0.3)
-            duty *= scale
-            self.get_logger().warn(f"Stability margin basso ({effective_margin:.2f}): duty scalato a {duty:.3f}")
+            # 5. Riduzione preventiva se ZMP si avvicina al limite (margine < 0.3)
+            if effective_margin < 0.3:
+                scale = max(0.1, effective_margin / 0.3)
+                duty *= scale
+                self.get_logger().warn(f"Stability margin basso ({effective_margin:.2f}): duty scalato a {duty:.3f}")
 
         self._publish_motor_cmd(duty)
         self._publish_status(setpoint, duty, effective_margin)

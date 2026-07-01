@@ -53,6 +53,10 @@ def generate_launch_description():
         'terrain', default_value='true',
         description='Avvia terrain assessor'
     )
+    arg_laser = DeclareLaunchArgument(
+        'laser', default_value='false',
+        description='Avvia nodo laser target detector per guidare il rover con un laser'
+    )
     arg_params = DeclareLaunchArgument(
         'params_file',
         default_value=os.path.join(
@@ -66,6 +70,7 @@ def generate_launch_description():
     nav   = LaunchConfiguration('nav')
     winch = LaunchConfiguration('winch')
     terrain = LaunchConfiguration('terrain')
+    laser = LaunchConfiguration('laser')
     params_file = LaunchConfiguration('params_file')
 
     # ---------------------------------------------------------------------------
@@ -238,6 +243,26 @@ def generate_launch_description():
     )
 
     # ---------------------------------------------------------------------------
+    # Nodo 10: Laser Target Detector (delay 3.2s, opzionale)
+    # ---------------------------------------------------------------------------
+    laser_target_detector_node = TimerAction(
+        period=3.2,
+        actions=[
+            LogInfo(msg="[LAUNCH] Avvio Laser Target Detector..."),
+            Node(
+                package='rover_navigation',
+                executable='laser_target_detector',
+                name='laser_target_detector',
+                output='screen',
+                parameters=[params_file],
+                condition=IfCondition(laser),
+                respawn=True,
+                respawn_delay=2.0,
+            )
+        ]
+    )
+
+    # ---------------------------------------------------------------------------
     # Robot State Publisher (URDF)
     # ---------------------------------------------------------------------------
     urdf_path = os.path.join(
@@ -265,7 +290,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         # Argomenti
-        arg_sim, arg_nav, arg_winch, arg_terrain, arg_params,
+        arg_sim, arg_nav, arg_winch, arg_terrain, arg_laser, arg_params,
         # Log
         log_start,
         # Nodi (in ordine di priorità)
@@ -279,4 +304,5 @@ def generate_launch_description():
         terrain_assessor_node,
         state_estimation_node,
         shared_autonomy_node,
+        laser_target_detector_node,
     ])

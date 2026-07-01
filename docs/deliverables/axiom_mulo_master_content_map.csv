@@ -1,0 +1,46 @@
+type,title,path
+image,hero,docs/diagrams/render_mulo_trekking_alpine.png
+image,studio,docs/diagrams/render_mulo_studio_dark.png
+image,chassis_layout,hardware/cad/chassis_layout.png
+image,chassis_bracing,hardware/cad/chassis_bracing.png
+image,wheel,hardware/cad/wheel_assembly.png
+image,bridge,hardware/cad/ponte_corazzato_exploded_view.png
+image,drivetrain,hardware/cad/blueprint_drivetrain_exploded.png
+image,winch,hardware/cad/blueprint_winch_assembly.png
+image,power_box,hardware/cad/cad_power_box_assembly.png
+image,rex_power_current,docs/enterprise/figures/rex_expected_power_current.png
+image,rex_rpm_vdc,docs/enterprise/figures/rex_expected_rpm_vdc.png
+image,rex_thermal,docs/enterprise/figures/rex_expected_thermal.png
+image,wireviz,hardware/electronics/rex_controller/generated/wireviz/rex_controller_harness.png
+image,rex_arch,hardware/electronics/rex_controller/generated/graphs/rex_power_architecture.png
+image,rex_carrier,hardware/mechanical/rex_controller_carrier/generated/rex_controller_carrier_plate.png
+image,battery,docs/diagrams/plot_battery_discharge_soc.png
+image,motor_curve,docs/diagrams/plot_motor_torque_speed.png
+image,uwb,docs/diagrams/plot_uwb_trilateration_error.png
+image,winch_curve,docs/diagrams/plot_winch_tension_slope.png
+image,cable_thermal,docs/research_thesis/electrical_cable_thermal_limits.png
+image,nmpc,docs/research_thesis/rover_nmpc_casadi_performance.png
+source_digest,Specifiche meccaniche e strutturali finali,docs/mulo_mk0_hardware_specs.md
+source_digest,Decisioni hardware per autonomia trekking,docs/mulo_trekking_autonomy_hardware_decisions.md
+source_digest,Disegni tecnici e tavole engineering,docs/mulo_mk0_engineering_drawings.md
+source_digest,Specifiche sintetiche Mulo,docs/mulo_specs.md
+source_digest,Verricello e stabilita',docs/winch_dynamics.md
+source_digest,Ricarica solare e trade-off energia,docs/mulo_solar_charging_tradeoff.md
+source_digest,Safety case enterprise,docs/enterprise/safety_case.md
+source_digest,V&V master plan,docs/enterprise/vv_master_plan.md
+source_digest,Baseline elettrica 24 V,docs/enterprise/electrical_baseline_24v.md
+source_digest,Range extender readiness,docs/enterprise/range_extender_readiness.md
+source_digest,Manufacturing readiness package,docs/enterprise/manufacturing_readiness_package.md
+source_digest,Data reporting standard,docs/enterprise/data_reporting_standard.md
+source_digest,Digital twin scenarios,docs/enterprise/digital_twin_scenarios.md
+source_digest,Cybersecurity plan,docs/enterprise/cybersecurity_plan.md
+source_digest,BOM meccanica e sottosistemi,hardware/bom.md
+source_digest,Albero custom 42CrMo4,hardware/mechanical/extension_shaft_specs.md
+source_digest,Istruzioni assemblaggio REX,hardware/electronics/rex_controller/assembly_work_instructions.md
+csv_table,Traceability matrix,docs/enterprise/traceability_matrix.csv
+csv_table,Wiring validation matrix,docs/enterprise/wiring_validation_matrix.csv
+csv_table,Range extender validation matrix,docs/enterprise/range_extender_validation_matrix.csv
+csv_table,BOM candidate shortlist,docs/enterprise/mulo_bom_candidate_shortlist.csv
+csv_table,REX controller harness,hardware/electronics/rex_controller/rex_controller_harness.csv
+csv_table,REX controller netlist,hardware/electronics/rex_controller/rex_controller_netlist.csv
+csv_table,REX controller BOM,hardware/electronics/rex_controller/rex_controller_bom.csv

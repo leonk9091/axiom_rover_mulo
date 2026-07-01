@@ -2,7 +2,7 @@
 <package format="3">
   <name>rover_safety</name>
   <version>1.0.0</version>
-  <description>Safety watchdog - heartbeat ESP32 + ISO 13849 E-Stop</description>
+  <description>Safety watchdog - STM32 safety MCU heartbeat + ISO 13849-oriented E-Stop</description>
   <maintainer email="rover@axiom.local">Axiom Rover Team</maintainer>
   <license>MIT</license>
 

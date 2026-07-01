@@ -17,6 +17,7 @@ setup(
             'follow_me = rover_navigation.nodes.follow_me:main',
             'shared_autonomy = rover_navigation.nodes.shared_autonomy:main',
             'terrain_assessor = rover_navigation.nodes.terrain_assessor:main',
+            'laser_target_detector = rover_navigation.nodes.laser_target_detector:main',
         ],
     },
 )

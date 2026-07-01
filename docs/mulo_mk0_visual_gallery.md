@@ -17,6 +17,18 @@ Questi file contengono la modellazione tridimensionale originale e i disegni cos
 *   **Esploso 3D del Ponte Corazzato:**
     *   File Disegno: [ponte_corazzato_exploded_view.png](../hardware/cad/ponte_corazzato_exploded_view.png)
     *   *Descrizione:* Vista assonometrica esplosa in stile tavola tecnica che mostra l'asse coassiale di accoppiamento tra il motore, la piastra da 6 mm, il cuscinetto UCF204, l'albero custom e la ruota Cargo da 20".
+*   **Tavola Costruttiva Snodo Centrale Articolato (Quick-Split):**
+    *   File Blueprint: [blueprint_chassis_articulation.png](../hardware/cad/blueprint_chassis_articulation.png)
+    *   *Descrizione:* Dettaglio ingegneristico dello snodo di torsione a sgancio rapido con accoppiamento cuscinetti ritti UCP204, albero di torsione da 20 mm e spina con coppiglia elastica.
+*   **Tavola Ingegneristica del Verricello Meccanico (Winch):**
+    *   File Blueprint: [blueprint_winch_assembly.png](../hardware/cad/blueprint_winch_assembly.png)
+    *   *Descrizione:* Vista tecnica quotata dell'ancoraggio del verricello sul semitelaio anteriore, passacavo a rulli e allineamento di tiro per l'auto-soccorso.
+*   **Dettaglio Esploso Assonometrico Ingegneristico:**
+    *   File Blueprint: [blueprint_drivetrain_exploded.png](../hardware/cad/blueprint_drivetrain_exploded.png)
+    *   *Descrizione:* Spaccato tecnico alternativo della catena cinematica coassiale (motore-piastra-flangia-ruota) in stile manuale d'officina.
+*   **Layout CAD 3D Vano di Potenza e Ricarica (Power Box):**
+    *   File CAD: [cad_power_box_assembly.png](../hardware/cad/cad_power_box_assembly.png)
+    *   *Descrizione:* Modello 3D che illustra l'alloggiamento stagno IP68 del Mean Well NPB-750-24 e del regolatore MPPT Victron, con flangia Rosenberger RoPD e passacavi AWG 10.
 *   **Modello dell'Albero Custom in SolidWorks (Tornitura):**
     *   File CAD: [albero_custom.SLDPRT](../hardware/cad/albero_custom.SLDPRT)
     *   *Descrizione:* Il file SolidWorks 3D originale del mozzo/albero custom in **42CrMo4** con la flangia a 6 fori integrata e il foro cieco da 14 mm per l'albero motore.
@@ -27,6 +39,34 @@ Questi file contengono la modellazione tridimensionale originale e i disegni cos
     *   File Telaio: [Parte3.SLDPRT](../../Parte3.SLDPRT) e [Parte4.SLDPRT](../../Parte4.SLDPRT) (nella root del progetto)
     *   Disegni Layout: [chassis_layout.png](../hardware/cad/chassis_layout.png) e [chassis_bracing.png](../hardware/cad/chassis_bracing.png)
     *   *Descrizione:* Modelli e render per la saldatura dei tubolari S235 da 30x30 mm e delle controventature diagonali del semitelaio.
+
+## Grafici Ingegneristici e Curve di Funzionamento (PNG)
+
+Questi grafici analizzano e validano le performance fisiche ed elettriche dei sistemi di bordo, fondamentali per lo sviluppo del firmware e il dimensionamento della batteria:
+
+*   **Curva di Coppia e Efficienza del Motore (Torque vs Speed):**
+    *   File Grafico: [plot_motor_torque_speed.png](diagrams/plot_motor_torque_speed.png)
+    *   *Descrizione:* Profilo di funzionamento della coppia erogata dal motore a 24V gestito da VESC in funzione del regime di giri (RPM) e della curva di efficienza energetica associata.
+*   **Curva di Scarica e Autonomia LiFePO4 (SoC %):**
+    *   File Grafico: [plot_battery_discharge_soc.png](diagrams/plot_battery_discharge_soc.png)
+    *   *Descrizione:* Andamento della tensione delle celle della batteria LiFePO4 in funzione dello Stato di Carica (State of Charge) per differenti correnti di scarica costanti (0.2C, 0.5C, 1C).
+*   **Errore Angolare UWB vs Distanza (Trilaterazione):**
+    *   File Grafico: [plot_uwb_trilateration_error.png](diagrams/plot_uwb_trilateration_error.png)
+    *   *Descrizione:* Analisi sperimentale della precisione di stima angolare del follow-me basato su due ancore UWB distanziate da 0.60 m (baseline).
+*   **Forza di Trazione Verricello vs Pendenza del Terreno:**
+    *   File Grafico: [plot_winch_tension_slope.png](diagrams/plot_winch_tension_slope.png)
+    *   *Descrizione:* Tensione richiesta sul cavo verricello (N) per differenti carichi trasportati (50 kg, 75 kg, 100 kg) in salita in funzione del grado di pendenza del terreno (0-45°).
+
+## Rendering d'Ambiente e Studio Tecnico (PNG)
+
+Questi rendering presentano il Mulo MK0 nel suo design finito ed operativo, utili per scopi di presentazione e validazione d'impatto visivo:
+
+*   **Render Studio Premium (Officina Dark):**
+    *   File Render: [render_mulo_studio_dark.png](diagrams/render_mulo_studio_dark.png)
+    *   *Descrizione:* Vista da studio fotografico professionale che mette in evidenza la finitura nero opaco del telaio tubolare in acciaio, le grandi ruote Cargo da 20" e lo snodo centrale in un'ambientazione officina pulita.
+*   **Render Operativo (Trekking Alpino):**
+    *   File Render: [render_mulo_trekking_alpine.png](diagrams/render_mulo_trekking_alpine.png)
+    *   *Descrizione:* Il rover Mulo ripreso in azione su un sentiero montano roccioso, mentre segue in modalità follow-me l'escursionista a distanza di sicurezza, portando in modo stabile i bagagli di trekking.
 
 ## Linguaggi per schemi
 

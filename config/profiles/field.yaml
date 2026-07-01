@@ -1,0 +1,15 @@
+hardware_bridge:
+  ros__parameters:
+    simulate_without_serial: false
+    allow_unsigned_mcu_status: false
+    command_timeout_ms: 250
+
+vesc_driver:
+  ros__parameters:
+    simulate_without_can: false
+    max_linear_vel: 0.6
+    max_angular_vel: 0.6
+
+power_monitor:
+  ros__parameters:
+    range_extender_enabled: false

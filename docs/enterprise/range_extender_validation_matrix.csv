@@ -1,0 +1,8 @@
+"test_id","priority","area","method","acceptance","evidence_path"
+"VV-P0-REX-001","P0","Baseline potenza","Review requisiti e parametri","Target continuo 600-700 W, picco e derating documentati","reports/evidence/VV-P0-REX-001/"
+"VV-P0-REX-002","P0","Kill ignition","E-stop, heartbeat loss e fault ECU con GX50 su banco","Engine kill entro limite definito, trazione off, fault latched","reports/evidence/VV-P0-REX-002/"
+"VV-P0-REX-003","P0","Parti rotanti","Runout/allineamento/tensione cinghia fino a 7500 rpm con guardie","Nessun contatto, vibrazione anomala o allentamento","reports/evidence/VV-P0-REX-003/"
+"VV-P0-REX-004","P0","Carica 24 V","Carico resistivo 100 W -> 700 W e batteria/BMS simulata","Vdc < 70 V, bus < 29.2 V, corrente controllata, no backfeed","reports/evidence/VV-P0-REX-004/"
+"VV-P0-REX-005","P0","Fuel CO fire","Checklist banco con CO monitor, ventilazione, estintore, leak check","Checklist firmata prima accensione, nessun leak, scarico schermato","reports/evidence/VV-P0-REX-005/"
+"VV-P1-REX-006","P1","Telemetria ROS","Replay/sim con RPM Vdc corrente e fault","RangeExtenderStatus completo e coerente con EnergyBudget","reports/evidence/VV-P1-REX-006/"
+"VV-P1-REX-007","P1","EMI","GX50 a carico con STM32, CAN, seriale, ACS758/INA226","Nessuna perdita heartbeat o lettura fuori range non spiegata","reports/evidence/VV-P1-REX-007/"

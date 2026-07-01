@@ -2,7 +2,7 @@
  * ESP32 Safety Firmware - Axiom Rover "Mulo"
  *
  * Funzioni:
- *   - Watchdog hardware: se heartbeat ROS manca per > 500ms → taglia motori (GPIO 14)
+ *   - Watchdog hardware: se heartbeat ROS manca per > 500ms → taglia motori (GPIO 26)
  *   - Lettura cella di carico HX711 (GPIO 18/19) → tensione cavo [N]
  *   - Lettura encoder verricello in quadratura (GPIO 32/33) → lunghezza cavo [m]
  *   - Pulsante E-Stop fisico (GPIO 14, interrupt) → E-Stop immediato
@@ -13,7 +13,8 @@
  *
  * Pinout (da esp32_pinout.md):
  *   GPIO 12 → ICE SSR
- *   GPIO 14 → E-Stop input (interrupt) + Motor Kill relay output
+ *   GPIO 14 → E-Stop input (interrupt)
+ *   GPIO 26 → Motor Kill relay output
  *   GPIO 18 → HX711 SCK
  *   GPIO 19 → HX711 DT
  *   GPIO 27 → Dump Load relay
@@ -31,7 +32,7 @@
 // ---------------------------------------------------------------------------
 #define PIN_ICE_SSR         12
 #define PIN_ESTOP_BTN       14   // INPUT_PULLUP, active LOW
-#define PIN_MOTOR_KILL      14   // stesso pin: se E-Stop → OUTPUT HIGH → relay taglia
+#define PIN_MOTOR_KILL      26   // OUTPUT, active HIGH: relay taglia consenso motori
 #define PIN_HX711_SCK       18
 #define PIN_HX711_DT        19
 #define PIN_DUMP_LOAD       27
@@ -102,7 +103,7 @@ void reset_estop() {
         (millis() - g_last_heartbeat_ms) < HEARTBEAT_TIMEOUT_MS) {
         g_estop_active    = false;
         g_estop_btn_press = false;
-        pinMode(PIN_MOTOR_KILL, INPUT_PULLUP);  // rilascia relay
+        digitalWrite(PIN_MOTOR_KILL, LOW);  // rilascia relay
     }
 }
 
@@ -165,6 +166,7 @@ void setup() {
     // Pin setup
     pinMode(PIN_ICE_SSR,   OUTPUT); digitalWrite(PIN_ICE_SSR,   LOW);
     pinMode(PIN_DUMP_LOAD, OUTPUT); digitalWrite(PIN_DUMP_LOAD, LOW);
+    pinMode(PIN_MOTOR_KILL, OUTPUT); digitalWrite(PIN_MOTOR_KILL, LOW);
     pinMode(PIN_LED,       OUTPUT); digitalWrite(PIN_LED,       LOW);
     pinMode(PIN_ESTOP_BTN, INPUT_PULLUP);
     pinMode(PIN_ENC_A,     INPUT_PULLUP);

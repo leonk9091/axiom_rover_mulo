@@ -17,6 +17,7 @@ from rover_interfaces.msg import (
     HardwareState,
     LinkState,
     MotorTelemetry,
+    RangeExtenderStatus,
     RoverState,
     SafetyState,
 )
@@ -79,6 +80,7 @@ class SafetyWatchdogNode(Node):
 
         self.create_subscription(String, "winch/status", lambda _: self._node_heartbeat("winch_manager"), 10)
         self.create_subscription(EnergyBudget, "power/energy_budget", lambda _: self._node_heartbeat("power_monitor"), 10)
+        self.create_subscription(RangeExtenderStatus, "range_extender/status", self._cb_range_extender_status, 10)
         self.create_subscription(MotorTelemetry, "motor_telemetry", lambda _: self._node_heartbeat("vesc_driver"), 10)
         self.create_subscription(String, "mission/autonomy_heartbeat", lambda _: self._node_heartbeat("shared_autonomy"), 10)
         self.create_subscription(RoverState, "system/rover_state", lambda _: self._node_heartbeat("state_estimation"), 10)
@@ -104,7 +106,19 @@ class SafetyWatchdogNode(Node):
         self.hardware_state = msg
         self._node_heartbeat("hardware_bridge")
         if msg.estop_hw and not self.estop_active:
-            self._trigger_estop("E-Stop hardware ESP32", "hardware_estop", FAULT_CRITICAL)
+            self._trigger_estop("E-Stop hardware safety MCU", "hardware_estop", FAULT_CRITICAL)
+
+    def _cb_range_extender_status(self, msg: RangeExtenderStatus) -> None:
+        self._node_heartbeat("power_monitor")
+        if msg.fault_code in (
+            RangeExtenderStatus.FAULT_NONE,
+            RangeExtenderStatus.FAULT_DISABLED,
+        ):
+            return
+        fault_code = f"range_extender_{msg.fault_label.lower()}"
+        if not any(f.fault_code == fault_code and f.active for f in self.fault_log):
+            reason = msg.reason or f"Range extender fault {msg.fault_label}"
+            self._trigger_estop(reason, fault_code, FAULT_CRITICAL)
 
     def _node_heartbeat(self, node_name: str) -> None:
         if node_name not in self._node_last_seen:

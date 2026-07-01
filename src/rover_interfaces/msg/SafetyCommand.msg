@@ -1,0 +1,11 @@
+std_msgs/Header header
+uint32 seq
+uint32 stamp_ms
+string mode
+float32 desired_linear_velocity_ms
+float32 desired_angular_velocity_rads
+uint16 timeout_ms
+bool estop_request
+bool enable_motors_request
+float32 max_current_a
+uint16 crc16

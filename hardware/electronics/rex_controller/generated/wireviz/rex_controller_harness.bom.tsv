@@ -1,0 +1,14 @@
+Id	Description	Qty	Unit	Designators
+1	Cable, 2 wires	1.3	m	W_DUMP, W_IGN
+2	Cable, 3 wires	2.1	m	W_RPM, W_SERVO, W_VDC
+3	Cable, 4 wires	2.3	m	W_ICHG, W_SAFE, W_TEMP, W_USB
+4	Connector, STM32 REX carrier internal terminals, 28 pins	1		REX_CARRIER
+5	Connector, USB service lead, 4 pins	1		J_USB_SERIAL
+6	Connector, dump load request lead, 2 pins	1		J_DUMP
+7	Connector, sealed 4-pin safety input, 4 pins	1		J_SAFE
+8	Connector, sealed RPM Hall lead, 3 pins	1		J_RPM
+9	Connector, sealed ignition kill lead, 2 pins	1		J_IGN
+10	Connector, sealed throttle servo lead, 3 pins	1		J_SERVO
+11	Connector, shielded DC link sense lead, 3 pins	1		J_VDC
+12	Connector, shielded charge current sense lead, 4 pins	1		J_ICHG
+13	Connector, temperature harness, 4 pins	1		J_TEMP

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import asyncio
 import math
+import time
 from typing import Optional
 
 import rclpy
@@ -14,13 +15,14 @@ from rclpy.node import Node
 from std_msgs.msg import Bool, String
 
 from rover_interfaces.action import FollowLeader
-from rover_interfaces.msg import LinkState, StabilityMargin, TerrainCost
+from rover_interfaces.msg import LinkState, StabilityMargin, TerrainCost, WinchState
 from rover_navigation.autonomy import (
     LeaderObservation,
     LinkDecision,
     SharedAutonomyCore,
     StabilityDecision,
     TerrainDecision,
+    WinchObservation,
 )
 
 
@@ -36,10 +38,17 @@ class SharedAutonomyNode(Node):
         self.allow_reverse = False
         self.estop_active = False
 
+        # Stati stradali e Guinzaglio
+        self.road_state = "nominal"
+        self.leash_enabled = False
+        self._last_pull_time = 0.0
+        self._pull_active = False
+
         self.leader_observation = LeaderObservation(False, 0.0, 0.0, 0.0)
         self.terrain_decision = TerrainDecision(True, 0.6, 0.5, 0.0)
         self.stability_decision = StabilityDecision(1.0, 1.0, False)
         self.link_decision = LinkDecision(True, True, False, "nominal")
+        self.winch_observation = WinchObservation("passive", 0.0, 0.0, 0.0)
         self._active_goal_handle: Optional[object] = None
         self._last_control_mode = "idle"
 
@@ -48,10 +57,14 @@ class SharedAutonomyNode(Node):
         self.create_subscription(StabilityMargin, "safety/stability_margin", self._cb_stability_margin, 10)
         self.create_subscription(LinkState, "safety/link_state", self._cb_link_state, 10)
         self.create_subscription(Bool, "safety/estop", self._cb_estop, 10)
+        self.create_subscription(WinchState, "winch/state", self._cb_winch_state, 10)
+        self.create_subscription(String, "navigation/road_state", self._cb_road_state, 10)
+        self.create_subscription(Bool, "navigation/leash_enabled", self._cb_leash_enabled, 10)
 
         self.cmd_pub = self.create_publisher(Twist, "mission/cmd_vel", 10)
         self.target_pub = self.create_publisher(PoseStamped, "mission/target_pose", 10)
         self.heartbeat_pub = self.create_publisher(String, "mission/autonomy_heartbeat", 10)
+        self.road_state_pub = self.create_publisher(String, "navigation/current_road_state", 10)
 
         self.action_server = ActionServer(
             self,
@@ -144,6 +157,35 @@ class SharedAutonomyNode(Node):
     def _cb_estop(self, msg: Bool) -> None:
         self.estop_active = msg.data
 
+    def _cb_road_state(self, msg: String) -> None:
+        self.road_state = msg.data.strip().lower()
+
+    def _cb_leash_enabled(self, msg: Bool) -> None:
+        self.leash_enabled = msg.data
+
+    def _cb_winch_state(self, msg: WinchState) -> None:
+        self.winch_observation = WinchObservation(
+            mode=msg.mode,
+            tension_measured_n=msg.tension_measured_n,
+            cable_length_m=msg.cable_length_m,
+            cable_velocity_ms=msg.cable_velocity_ms,
+        )
+
+        # Riconoscimento del Doppio Strattone (Handshake Attraversamento)
+        now = time.monotonic()
+        tension = msg.tension_measured_n
+        if tension > 100.0:
+            if not self._pull_active:
+                self._pull_active = True
+                # Intervallo corretto tra i due strattoni (tra 0.2s e 1.5s)
+                if 0.2 < (now - self._last_pull_time) < 1.5:
+                    self.get_logger().info("DOPPIO STRATTONE RILEVATO: Handshake per Attraversamento Strada!")
+                    if self.road_state == "waiting_for_crossing":
+                        self.road_state = "crossing"
+                self._last_pull_time = now
+        else:
+            self._pull_active = False
+
     def _control_loop(self) -> None:
         if self.estop_active:
             self._stop_motion()
@@ -154,10 +196,13 @@ class SharedAutonomyNode(Node):
             terrain=self.terrain_decision,
             stability=self.stability_decision,
             link=self.link_decision,
+            winch=self.winch_observation,
             target_distance_m=self.target_distance_m,
             max_linear_velocity_ms=self.max_linear_velocity_ms,
             max_angular_velocity_rads=self.max_angular_velocity_rads,
             allow_reverse=self.allow_reverse,
+            leash_enabled=self.leash_enabled,
+            road_state=self.road_state,
         )
 
         twist = Twist()
@@ -166,6 +211,7 @@ class SharedAutonomyNode(Node):
         self.cmd_pub.publish(twist)
         self._last_control_mode = command.control_mode
         self.heartbeat_pub.publish(String(data=command.control_mode))
+        self.road_state_pub.publish(String(data=self.road_state))
 
         if self.leader_observation.visible:
             target = PoseStamped()

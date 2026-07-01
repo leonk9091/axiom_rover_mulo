@@ -1,0 +1,16 @@
+std_msgs/Header header
+uint32 seq_ack
+uint32 mcu_uptime_ms
+string safety_state
+bool estop_active
+bool motor_consent
+string fault_code
+bool fault_latched
+uint16 heartbeat_age_ms
+uint32 sensor_validity
+string degraded_mode
+float32 roll_rad
+float32 pitch_rad
+float32 battery_voltage_v
+float32 motor_current_a
+uint16 crc16

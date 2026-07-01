@@ -111,14 +111,16 @@ class VESCCANInterface:
     Interfaccia CAN per comunicazione con VESC tramite python-can + pyvesc.
     Thread-safe: usa lock per accesso al bus CAN.
     """
-    def __init__(self, interface: str, bitrate: int, logger):
+    def __init__(self, interface: str, bitrate: int, logger, simulate_without_can: bool = False):
         self.logger = logger
         self._lock = threading.Lock()
         self._bus = None
         self.connected = False
 
         if not CAN_AVAILABLE:
-            logger.warn("pyvesc/python-can non installati. Modalità simulata.")
+            if not simulate_without_can:
+                raise RuntimeError("pyvesc/python-can non installati e simulazione CAN disabilitata")
+            logger.warn("pyvesc/python-can non installati. Modalità simulata esplicita.")
             return
 
         try:
@@ -130,7 +132,9 @@ class VESCCANInterface:
             self.connected = True
             logger.info(f"CAN bus connesso: {interface} @ {bitrate} bps")
         except Exception as e:
-            logger.warn(f"CAN bus non disponibile ({e}). Modalità simulata.")
+            if not simulate_without_can:
+                raise RuntimeError(f"CAN bus non disponibile e simulazione CAN disabilitata: {e}") from e
+            logger.warn(f"CAN bus non disponibile ({e}). Modalità simulata esplicita.")
 
     def set_rpm(self, motor_id: int, rpm: int):
         """Invia comando RPM a un VESC via CAN."""
@@ -308,8 +312,10 @@ class VescDriverNode(Node):
         self.declare_parameter('can_interface', CAN_INTERFACE)
         self.declare_parameter('max_linear_vel', 1.2)
         self.declare_parameter('max_angular_vel', 1.5)
+        self.declare_parameter('simulate_without_can', False)
 
         can_iface = self.get_parameter('can_interface').get_parameter_value().string_value
+        simulate_without_can = bool(self.get_parameter('simulate_without_can').value)
 
         # QoS safety
         qos_reliable = QoSProfile(
@@ -331,7 +337,12 @@ class VescDriverNode(Node):
         self._fault_active: dict[int, bool] = {mid: False for mid in MOTOR_IDS}
 
         # --- Componenti ---
-        self.can_iface  = VESCCANInterface(can_iface, CAN_BITRATE, self.get_logger())
+        self.can_iface  = VESCCANInterface(
+            can_iface,
+            CAN_BITRATE,
+            self.get_logger(),
+            simulate_without_can=simulate_without_can,
+        )
         self.kinematics = DifferentialKinematics4WD()
         self.regen      = RegenBrakeController()
 

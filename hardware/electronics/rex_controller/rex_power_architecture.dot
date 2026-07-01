@@ -1,0 +1,29 @@
+digraph MULO_REX {
+  rankdir=LR;
+  node [shape=box, style="rounded"];
+
+  GX50 [label="Honda GX50"];
+  Clutch [label="Centrifugal clutch"];
+  Belt [label="HTD 5M belt"];
+  BLDC [label="BLDC outrunner alternator"];
+  Rectifier [label="3-phase rectifier"];
+  DCLink [label="DC link caps\n100 V min"];
+  Buck [label="Buck CC/CV"];
+  Ideal [label="Ideal diode / charge contactor"];
+  Battery [label="24 V LiFePO4"];
+
+  Safety [label="Safety MCU / E-stop"];
+  REX [label="STM32 REX controller"];
+  Kill [label="Ignition kill relay/opto"];
+  Servo [label="Throttle servo + spring"];
+  Sensors [label="RPM / Vdc / Icharge / Temps"];
+  Host [label="Jetson ROS logging"];
+
+  GX50 -> Clutch -> Belt -> BLDC -> Rectifier -> DCLink -> Buck -> Ideal -> Battery;
+  Safety -> REX [label="SAFETY_KILL_N"];
+  Host -> REX [label="aux command + aux_crc16"];
+  REX -> Host [label="status JSON"];
+  REX -> Kill -> GX50 [label="kill ignition"];
+  REX -> Servo -> GX50 [label="throttle"];
+  Sensors -> REX;
+}

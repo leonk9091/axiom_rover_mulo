@@ -1,0 +1,1888 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axiom Rover "Mulo" MK0 - Tesi di Progetto e Manuale di Officina</title>
+    <!-- Google Fonts per una tipografia moderna e leggibile -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ==========================================================================
+           1. SISTEMA DI DESIGN E CSS TOKENS (SCREEN MODE - DEFAULT DARK)
+           ========================================================================== */
+        :root {
+            --bg-main: #0a0e14;
+            --bg-sidebar: #0f141c;
+            --bg-card: rgba(21, 28, 38, 0.6);
+            --border-color: rgba(255, 255, 255, 0.08);
+            
+            --text-primary: #f0f3f6;
+            --text-secondary: #8b949e;
+            --text-muted: #6e7681;
+            
+            --primary: #00f2fe;
+            --primary-glow: rgba(0, 242, 254, 0.15);
+            --secondary: #4facfe;
+            --accent: #ff4a5a;
+            --accent-glow: rgba(255, 74, 90, 0.15);
+            
+            --font-head: 'Outfit', 'Inter', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --transition-speed: 0.25s;
+            --sidebar-width: 280px;
+        }
+
+        /* Reset e Struttura di Base */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Layout Principale a Schermo */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ==========================================================================
+           2. SIDEBAR DI NAVIGAZIONE INTERATTIVA (SCREEN ONLY)
+           ========================================================================== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            margin-bottom: 2.5rem;
+        }
+
+        .sidebar-brand h1 {
+            font-family: var(--font-head);
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar-brand span {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            flex-grow: 1;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.6rem;
+        }
+
+        .sidebar-menu a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: all var(--transition-speed) ease;
+            border: 1px solid transparent;
+        }
+
+        .sidebar-menu a:hover {
+            color: var(--primary);
+            background-color: rgba(0, 242, 254, 0.05);
+            border-color: rgba(0, 242, 254, 0.1);
+            transform: translateX(5px);
+        }
+
+        .sidebar-footer {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-print {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #05080c;
+            border: none;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            font-family: var(--font-head);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.2);
+        }
+
+        .btn-print:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 242, 254, 0.35);
+        }
+
+        /* ==========================================================================
+           3. AREA CONTENUTO PRINCIPALE (SCREEN & STAMPA)
+           ========================================================================== */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex-grow: 1;
+            padding: 3rem 4rem;
+            max-width: 1100px;
+        }
+
+        /* ==========================================================================
+           4. COPERTINA / TITLE PAGE (SCREEN & STAMPA)
+           ========================================================================== */
+        .cover-page {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: calc(100vh - 6rem);
+            padding: 2rem 0;
+            position: relative;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 4rem;
+        }
+
+        .cover-badge {
+            background-color: var(--primary-glow);
+            color: var(--primary);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            display: inline-block;
+            align-self: flex-start;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-family: var(--font-head);
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        .cover-title {
+            font-family: var(--font-head);
+            font-size: 4.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff, #8892b0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cover-subtitle {
+            font-family: var(--font-head);
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: var(--secondary);
+            margin-bottom: 3rem;
+            max-width: 700px;
+        }
+
+        .cover-meta {
+            margin-top: auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            padding-top: 3rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .meta-item h4 {
+            font-family: var(--font-head);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.3rem;
+        }
+
+        .meta-item p {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* ==========================================================================
+           5. ELEMENTI DI IMPAGINAZIONE TECNICA (EQUAZIONI, TABELLE, BLOCCHI)
+           ========================================================================== */
+        .section-header {
+            margin-top: 5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .section-number {
+            font-family: var(--font-head);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        h2 {
+            font-family: var(--font-head);
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #ffffff;
+        }
+
+        h3 {
+            font-family: var(--font-head);
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: var(--secondary);
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        p {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            text-align: justify;
+        }
+
+        strong {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        /* Formule Matematiche Unicode Premium */
+        .equation-box {
+            background-color: var(--bg-card);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 12px 12px 0;
+            font-family: var(--font-mono);
+            font-size: 1.15rem;
+            color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .equation-title {
+            font-family: var(--font-head);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .equation-explain {
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        /* Tabelle Informative */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2.5rem 0;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background-color: rgba(79, 172, 254, 0.15);
+            font-family: var(--font-head);
+            font-weight: 700;
+            color: var(--secondary);
+            text-align: left;
+            padding: 1rem 1.2rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 1rem 1.2rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        tr:hover td {
+            background-color: rgba(255,255,255,0.02);
+            color: #ffffff;
+        }
+
+        /* Note Ingegneristiche in stile GitHub */
+        .engineering-alert {
+            background-color: rgba(255, 74, 90, 0.05);
+            border: 1px solid rgba(255, 74, 90, 0.2);
+            border-left: 4px solid var(--accent);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .engineering-alert-title {
+            font-family: var(--font-head);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .engineering-alert p {
+            margin-bottom: 0;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        /* ==========================================================================
+           6. CONTENITORI IMMAGINI E RENDER (CON EFFETTI DI ZING E DIDASCALIA)
+           ========================================================================== */
+        .image-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin: 2.5rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            transition: all var(--transition-speed) ease;
+        }
+
+        .image-card:hover {
+            border-color: rgba(0, 242, 254, 0.25);
+            box-shadow: 0 15px 40px rgba(0, 242, 254, 0.1);
+        }
+
+        .image-wrapper {
+            position: relative;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #05070a;
+        }
+
+        .image-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .image-wrapper:hover img {
+            transform: scale(1.02);
+        }
+
+        .image-caption {
+            font-family: var(--font-head);
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            border-left: 2px solid var(--secondary);
+            padding-left: 0.75rem;
+        }
+
+        .image-caption span {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: block;
+            margin-top: 0.2rem;
+        }
+
+        /* Lista di Montaggio Costruttiva */
+        .assembly-list {
+            list-style: none;
+            margin: 2rem 0;
+        }
+
+        .assembly-list li {
+            position: relative;
+            padding-left: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .assembly-step-num {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2.2rem;
+            height: 2.2rem;
+            background-color: var(--primary-glow);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-head);
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .assembly-step-title {
+            font-family: var(--font-head);
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+
+        .manual-note {
+            background: linear-gradient(135deg, rgba(0, 242, 254, 0.09), rgba(79, 172, 254, 0.05));
+            border: 1px solid rgba(0, 242, 254, 0.18);
+            border-left: 4px solid var(--primary);
+            border-radius: 8px;
+            padding: 1.25rem 1.4rem;
+            margin: 2rem 0;
+        }
+
+        .manual-note strong {
+            color: var(--primary);
+        }
+
+        .kpi-grid,
+        .phase-grid,
+        .work-grid,
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .kpi-card,
+        .phase-card,
+        .work-card,
+        .test-card,
+        .signoff-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.2rem;
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+        }
+
+        .kpi-label,
+        .phase-label,
+        .work-label {
+            display: block;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.45rem;
+        }
+
+        .kpi-value {
+            font-family: var(--font-head);
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .kpi-note {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.45rem;
+        }
+
+        .phase-card h4,
+        .work-card h4,
+        .test-card h4,
+        .signoff-card h4 {
+            color: var(--text-primary);
+            font-family: var(--font-head);
+            font-size: 1rem;
+            margin-bottom: 0.55rem;
+        }
+
+        .checklist {
+            list-style: none;
+            margin: 1.4rem 0 2rem;
+        }
+
+        .checklist li {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .checklist li::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0.35rem;
+            width: 0.9rem;
+            height: 0.9rem;
+            border: 1.5px solid var(--primary);
+            border-radius: 3px;
+            background: rgba(0, 242, 254, 0.06);
+        }
+
+        .status-pill {
+            display: inline-block;
+            border-radius: 999px;
+            border: 1px solid var(--border-color);
+            padding: 0.18rem 0.55rem;
+            margin: 0.1rem 0.2rem 0.1rem 0;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 0.74rem;
+            white-space: nowrap;
+        }
+
+        .status-p0 {
+            border-color: rgba(255, 74, 90, 0.45);
+            color: #ff7a86;
+            background-color: rgba(255, 74, 90, 0.08);
+        }
+
+        .status-p1 {
+            border-color: rgba(255, 190, 92, 0.45);
+            color: #ffc76f;
+            background-color: rgba(255, 190, 92, 0.08);
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 1.25rem;
+            margin: 2rem 0;
+        }
+
+        .acceptance-table td:first-child {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .signoff-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .signature-line {
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            margin-top: 2rem;
+            padding-top: 0.7rem;
+        }
+
+        /* Elementi Interattivi ed Effetti di Stampa */
+        .page-break {
+            display: block;
+        }
+
+        @media (max-width: 920px) {
+            html,
+            body {
+                overflow-x: hidden;
+            }
+
+            .sidebar {
+                position: static;
+                width: 100%;
+                min-height: auto;
+                padding: 2rem 1.25rem;
+            }
+
+            .app-container {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 2rem 1.25rem;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .cover-title {
+                font-size: 2.55rem;
+                overflow-wrap: break-word;
+            }
+
+            .cover-subtitle {
+                font-size: 1.25rem;
+            }
+
+            .cover-meta {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            h3 {
+                font-size: 1.35rem;
+            }
+
+            .kpi-grid,
+            .phase-grid,
+            .work-grid,
+            .test-grid,
+            .two-column,
+            .signoff-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                display: block;
+                max-width: 100%;
+                overflow-x: auto;
+            }
+
+            th,
+            td {
+                min-width: 11rem;
+                word-break: normal;
+            }
+        }
+
+        /* ==========================================================================
+           7. MEDIA QUERY DI STAMPA A4 PROFESSIONALE (@media print)
+           ========================================================================== */
+        @media print {
+            /* Forzatura del Tema Chiaro Ingegneristico */
+            :root {
+                --bg-main: #ffffff;
+                --bg-sidebar: #ffffff;
+                --bg-card: #f8f9fa;
+                --border-color: #dee2e6;
+                --text-primary: #000000;
+                --text-secondary: #212529;
+                --text-muted: #6c757d;
+                --primary: #0d6efd;
+                --secondary: #495057;
+                --accent: #dc3545;
+            }
+
+            body {
+                background-color: #ffffff;
+                color: #000000;
+                font-size: 10.5pt;
+                line-height: 1.5;
+            }
+
+            /* Nascondere Elementi di Controllo e Sidebar */
+            .sidebar, .btn-print {
+                display: none !important;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
+
+            /* Configurazione del Foglio A4 */
+            @page {
+                size: A4 portrait;
+                margin: 20mm 15mm 20mm 15mm;
+                
+                @top-center {
+                    content: "Axiom Rover Mulo MK0 - Tesi di Ingegneria";
+                    font-family: 'Inter', sans-serif;
+                    font-size: 8pt;
+                    color: #6c757d;
+                    border-bottom: 0.5px solid #dee2e6;
+                    padding-bottom: 5px;
+                }
+                
+                @bottom-right {
+                    content: "Pagina " counter(page);
+                    font-family: 'Inter', sans-serif;
+                    font-size: 8pt;
+                    color: #6c757d;
+                }
+            }
+
+            /* Gestione dei Titoli e Interruzioni */
+            h1, h2, h3, h4, h5, h6 {
+                color: #000000 !important;
+                page-break-after: avoid;
+                page-break-inside: avoid;
+            }
+
+            .section-header {
+                page-break-before: always;
+                margin-top: 0;
+                border-bottom: 1.5px solid #000000;
+                padding-bottom: 8px;
+            }
+
+            /* Forzatura Interruzione Pagina */
+            .page-break {
+                page-break-before: always !important;
+            }
+
+            .cover-page {
+                min-height: 90vh !important;
+                border: 2px solid #000000 !important;
+                padding: 40mm 20mm !important;
+                margin-bottom: 0 !important;
+                page-break-after: always;
+            }
+
+            .cover-title {
+                color: #000000 !important;
+                background: none !important;
+                -webkit-text-fill-color: initial !important;
+                font-size: 32pt !important;
+                text-align: center;
+                margin-top: 20mm;
+            }
+
+            .cover-subtitle {
+                color: #495057 !important;
+                font-size: 16pt !important;
+                text-align: center;
+                margin-bottom: 40mm !important;
+            }
+
+            .cover-meta {
+                border-top: 1.5px solid #000000 !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+                padding-top: 20mm !important;
+            }
+
+            .meta-item h4 {
+                color: #6c757d !important;
+            }
+
+            .meta-item p {
+                color: #000000 !important;
+            }
+
+            .cover-badge {
+                display: none !important;
+            }
+
+            /* Formattazione Elementi Tecnici per Stampa */
+            p {
+                font-size: 10.5pt;
+                color: #212529 !important;
+                orphans: 3;
+                widows: 3;
+            }
+
+            .equation-box {
+                background-color: #f8f9fa !important;
+                border: 1px solid #dee2e6 !important;
+                border-left: 4px solid #000000 !important;
+                color: #000000 !important;
+                page-break-inside: avoid;
+            }
+
+            .equation-explain {
+                color: #495057 !important;
+            }
+
+            table {
+                margin: 15pt 0;
+                page-break-inside: avoid;
+                border: 1px solid #dee2e6;
+            }
+
+            th {
+                background-color: #e9ecef !important;
+                color: #000000 !important;
+                border-bottom: 1.5px solid #000000 !important;
+            }
+
+            td {
+                border-bottom: 1px solid #dee2e6 !important;
+                color: #212529 !important;
+            }
+
+            .engineering-alert {
+                background-color: #f8f9fa !important;
+                border: 1px solid #dee2e6 !important;
+                border-left: 4px solid #dc3545 !important;
+                page-break-inside: avoid;
+            }
+
+            .engineering-alert-title {
+                color: #dc3545 !important;
+            }
+
+            /* Ottimizzazione Immagini per Stampa */
+            .image-card {
+                background-color: #ffffff !important;
+                border: 1px solid #dee2e6 !important;
+                padding: 5px !important;
+                page-break-inside: avoid;
+                box-shadow: none !important;
+            }
+
+            .image-wrapper {
+                background-color: #ffffff !important;
+            }
+
+            .image-caption {
+                color: #000000 !important;
+                border-left: 2px solid #000000 !important;
+                font-size: 9pt !important;
+            }
+
+            .image-caption span {
+                color: #6c757d !important;
+            }
+
+            .assembly-step-num {
+                background-color: #ffffff !important;
+                border: 1.5px solid #000000 !important;
+                color: #000000 !important;
+            }
+
+            .assembly-step-title {
+                color: #000000 !important;
+            }
+
+            .manual-note,
+            .kpi-card,
+            .phase-card,
+            .work-card,
+            .test-card,
+            .signoff-card {
+                background-color: #ffffff !important;
+                border: 1px solid #dee2e6 !important;
+                box-shadow: none !important;
+                page-break-inside: avoid;
+            }
+
+            .kpi-grid,
+            .phase-grid,
+            .work-grid,
+            .test-grid,
+            .two-column,
+            .signoff-grid {
+                gap: 8pt !important;
+            }
+
+            .status-pill {
+                border-color: #6c757d !important;
+                color: #212529 !important;
+                background-color: #ffffff !important;
+            }
+
+            .checklist li {
+                color: #212529 !important;
+            }
+
+            .checklist li::before {
+                border-color: #000000 !important;
+                background-color: #ffffff !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar di Navigazione (Screen Mode Only) -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <h1>AXIOM ROVER</h1>
+                <span>Modulo Trekking MK0 "Mulo"</span>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li><a href="#copertina">Copertina</a></li>
+                <li><a href="#cap1">1. Visione & Requisiti</a></li>
+                <li><a href="#cap2">2. Fisica & Meccanica</a></li>
+                <li><a href="#cap3">3. Cinematica & Energia</a></li>
+                <li><a href="#cap4">4. Controllo & Sensori</a></li>
+                <li><a href="#cap5">5. Manuale Costruttivo</a></li>
+                <li><a href="#cap6">6. Roadmap Lavori</a></li>
+                <li><a href="#cap7">7. Collaudo & Diagnostica</a></li>
+                <li><a href="#cap8">8. Sicurezza & Firma</a></li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <button class="btn-print" onclick="window.print()">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle;">
+                        <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                        <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/>
+                    </svg>
+                    Stampa / Salva PDF
+                </button>
+            </div>
+        </aside>
+
+        <!-- Contenuto della Tesi -->
+        <main class="main-content">
+            
+            <!-- Copertina -->
+            <section id="copertina" class="cover-page">
+                <div class="cover-badge">Progetto Ingegneristico Avanzato</div>
+                <h1 class="cover-title">Axiom Rover "Mulo" MK0</h1>
+                <p class="cover-subtitle">Studio della Fisica Strutturale, Propulsione Ibrida e Algoritmi di Tracciamento per il Trekking Autonomo</p>
+                
+                <div class="cover-meta">
+                    <div class="meta-item">
+                        <h4>Autore Principale</h4>
+                        <p>Team di Ingegneria Axiom</p>
+                    </div>
+                    <div class="meta-item">
+                        <h4>Destinazione D'Uso</h4>
+                        <p>Carpenteria & Investitori</p>
+                    </div>
+                    <div class="meta-item">
+                        <h4>Data di Rilascio</h4>
+                        <p>28 Maggio 2026</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="manual-note">
+                <p>
+                    <strong>Come usare questo documento:</strong> la prima parte giustifica il progetto come tesi ingegneristica; la seconda parte e' un manuale da officina. Prima di comprare o saldare, chiudi le checklist P0, compila la BOM reale e prepara i test di banco. Ogni sezione deve produrre un risultato verificabile: pezzo montato, misura registrata, prova superata o rischio annotato.
+                </p>
+            </section>
+
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <span class="kpi-label">Missione MK0</span>
+                    <div class="kpi-value">Rolling chassis 4WD sicuro</div>
+                    <div class="kpi-note">Cammina, frena, registra dati e si ferma in modo prevedibile prima di aggiungere autonomia avanzata.</div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-label">Priorita' tecnica</span>
+                    <div class="kpi-value">Safety, cablaggio, freni, termica</div>
+                    <div class="kpi-note">Sono i sistemi che trasformano una bella idea in un prototipo costruibile e recuperabile sul sentiero.</div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-label">Budget realistico</span>
+                    <div class="kpi-value">4.000-5.500 EUR</div>
+                    <div class="kpi-note">Fascia "trekking serio" se carpenteria, integrazione e test vengono gestiti internamente.</div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-label">Regola di avanzamento</span>
+                    <div class="kpi-value">Nessuna AI prima della base</div>
+                    <div class="kpi-note">Jetson, LiDAR evoluti e funzioni sentry arrivano dopo trazione, E-stop, logging e collaudi ripetibili.</div>
+                </div>
+            </div>
+
+            <!-- CAPITOLO 1 -->
+            <section id="cap1" class="section-header">
+                <span class="section-number">Capitolo 1</span>
+                <h2>Visione e Requisiti Operativi</h2>
+            </section>
+            
+            <p>
+                La logistica nei contesti escursionistici e di esplorazione territoriale affronta da sempre il vincolo fisiologico della capacità di carico dell'operatore umano. Il trasporto di strumentazione scientifica, attrezzature di soccorso alpino o bagagli da trekking su distanze prolungate e terreni fortemente accidentati genera fatica precoce, riducendo la sicurezza e l'efficacia delle missioni. 
+            </p>
+            <p>
+                Il progetto <strong>Axiom Rover "Mulo" MK0</strong> nasce per colmare questa lacuna operativa attraverso un robot da trasporto terrestre collaborativo con funzionalità <strong>follow-me</strong>. Concepito per muoversi su pendenze sterrate fino a 45 gradi e superare ostacoli fisici significativi, il Mulo scarica interamente il peso logistico dall'uomo, mantenendosi a una distanza di sicurezza costante grazie a sensori attivi.
+            </p>
+
+            <div class="image-card">
+                <div class="image-wrapper">
+                    <img src="diagrams/render_mulo_studio_dark.png" alt="Axiom Rover Mulo Studio">
+                </div>
+                <div class="image-caption">
+                    Render Studio 1: Il Rover Axiom "Mulo" MK0
+                    <span>Vista da studio fotografico che evidenzia la robustezza del telaio in acciaio nero opaco e le ruote Cargo da 20 pollici.</span>
+                </div>
+            </div>
+
+            <p>
+                Per soddisfare i severi standard operativi e attrarre l'interesse di partner industriali ed investitori, l'architettura del Mulo MK0 si fonda su tre pilastri cardine:
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pilastro</th>
+                        <th>Soluzione Tecnica</th>
+                        <th>Vantaggio per l'Investitore & Officina</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Robustezza Totale</strong></td>
+                        <td>Chassis tubolare S235 e giunti in 42CrMo4</td>
+                        <td>Minima manutenzione sul campo, alta resistenza strutturale ai carichi dinamici.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Modularità Quick-Split</strong></td>
+                        <td>Snodo centrale a sgancio rapido con spine a scatto</td>
+                        <td>Facilità di trasporto nel bagagliaio di una jeep e rapido disassemblaggio manuale.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Sicurezza Funzionale</strong></td>
+                        <td>E-Stop fisico e logico separato (ISO 13849)</td>
+                        <td>Conformità alle normative vigenti di robotica collaborativa, prevenzione dei rischi.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>1.1 Specifica Operativa Congelata per MK0</h3>
+            <p>
+                Per evitare che il progetto cresca in modo confuso, MK0 viene trattato come versione fisica e safety-first. L'obiettivo non e' dimostrare tutte le funzioni future, ma costruire una piattaforma che possa essere provata, misurata, riparata e migliorata senza rifare tutto.
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Area</th>
+                        <th>Target MK0</th>
+                        <th>Criterio di accettazione</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Trazione</td>
+                        <td>4 motori brushless/ridotti 24 V, controllo VESC via CAN</td>
+                        <td>Comando velocita' stabile con ruote sollevate, poi marcia lenta su piano senza fault.</td>
+                    </tr>
+                    <tr>
+                        <td>Stazionamento</td>
+                        <td>Freni meccanici a disco 203 mm indipendenti dalla batteria</td>
+                        <td>Rover fermo a batteria spenta su pendenza di prova con carico previsto.</td>
+                    </tr>
+                    <tr>
+                        <td>Sicurezza</td>
+                        <td>E-stop fisico, consenso motori fail-safe, watchdog comando</td>
+                        <td>Perdita ROS, perdita heartbeat o pressione E-stop portano coppia motore a zero.</td>
+                    </tr>
+                    <tr>
+                        <td>Energia</td>
+                        <td>LiFePO4 24 V, fusibili, sezionatore, DC-DC e dump load</td>
+                        <td>Nessuna sovratensione in discesa simulata con batteria alta; rami protetti e accessibili.</td>
+                    </tr>
+                    <tr>
+                        <td>Follow-me</td>
+                        <td>UWB/radio come riferimento locale, GPS solo supporto/log</td>
+                        <td>Se il tag e' perso o incoerente, il rover rallenta e si ferma: non insegue alla cieca.</td>
+                    </tr>
+                    <tr>
+                        <td>Diagnostica</td>
+                        <td>Log di tensione, corrente, temperatura, fault, link e stato safety</td>
+                        <td>Ogni test outdoor produce dati leggibili per ricostruire il comportamento.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>1.2 Prima Checklist da Chiudere</h3>
+            <ul class="checklist">
+                <li>Compilare la BOM reale con fornitore, link, prezzo, massa, tensione/corrente, stato acquisto e alternativa possibile.</li>
+                <li>Bloccare le quote principali del telaio: interasse, carreggiata, altezza baricentro stimata, posizione batteria, posizione snodo e ingombro ruote.</li>
+                <li>Disegnare lo schema elettrico di potenza: batteria -> fusibili -> sezionatore -> bus DC -> VESC, DC-DC, MCU, Jetson, dump load e ricarica.</li>
+                <li>Definire il circuito E-stop prima del software: il comando ROS non deve essere l'unico modo per togliere coppia.</li>
+                <li>Preparare una postazione di prova con ruote sollevate, estintore idoneo, multimetro, pinza amperometrica e accesso rapido al sezionatore.</li>
+            </ul>
+
+            <!-- CAPITOLO 2 -->
+            <section id="cap2" class="section-header">
+                <span class="section-number">Capitolo 2</span>
+                <h2>Fisica e Meccanica Strutturale</h2>
+            </section>
+
+            <h3>2.1 Il Ponte Corazzato: Scarico del Momento Flettente</h3>
+            <p>
+                Nei sistemi tradizionali di movimentazione diretta (direct drive), l'albero di uscita del riduttore del motore sostiene direttamente la ruota. In contesti off-road, le forze d'impatto radiale e le forti sollecitazioni di taglio generano un momento flettente distruttivo che deforma gli ingranaggi interni del motore, provocando il grippaggio o la rottura permanente del drivetrain.
+            </p>
+            <p>
+                Il Mulo MK0 introduce la filosofia del <strong>Ponte Corazzato (Reinforced Direct Drive)</strong>: una piastra di acciaio strutturale da 6 mm viene interposta tra lo chassis e la ruota, accoppiata a un cuscinetto flangiato <strong>UCF204</strong> montato all'esterno.
+            </p>
+
+            <div class="equation-box">
+                <span class="equation-title">Equazione 2.1: Momento Flettente sull'Albero Motore</span>
+                M_f = F_r * L_c
+                <span class="equation-explain">Dove F_r è la forza radiale generata dal carico sulla ruota e L_c è la distanza dal baricentro della ruota al cuscinetto di supporto.</span>
+            </div>
+
+            <p>
+                Nello schema convenzionale, l'albero motore subisce interamente il momento <code>M_f</code>. Con il Ponte Corazzato, la forza radiale <code>F_r</code> viene istantaneamente assorbita dal robusto cuscinetto flangiato UCF204 e scaricata sullo chassis d'acciaio tubolare. L'albero di prolunga custom in <strong>42CrMo4</strong> lavora quindi esclusivamente in <strong>torsione pura</strong>, allungando la vita utile dei motori di oltre il 400%.
+            </p>
+
+            <div class="image-card">
+                <div class="image-wrapper">
+                    <img src="../hardware/cad/blueprint_drivetrain_exploded.png" alt="Esploso Trasmissione">
+                </div>
+                <div class="image-caption">
+                    Tavola Meccanica 1: Esploso Ingegneristico della Catena Cinematica (Drivetrain)
+                    <span>Allineamento coassiale di: motore da 200W, staffa spessore 6 mm, cuscinetto UCF204 e albero custom in 42CrMo4 con freno a disco da 203 mm.</span>
+                </div>
+            </div>
+
+            <h3>2.2 Lo Snodo Centrale Quick-Split: Dinamica di Torsione</h3>
+            <p>
+                Per consentire alle quattro ruote del Mulo di rimanere permanentemente a contatto con il suolo roccioso (evitando la perdita di trazione e il ribaltamento statico), i semitelai anteriore e posteriore devono potersi disallineare torsionalmente. Questo movimento è garantito da un perno cilindrico passante in acciaio da 20 mm <code>h6</code>, montato su due supporti ritti <strong>UCP204</strong>.
+            </p>
+            <div class="engineering-alert">
+                <div class="engineering-alert-title">Nota critica: tolleranze di montaggio (Officina)</div>
+                <p>
+                    Per garantire lo sfilamento manuale rapido (Quick-Split) tramite le due spine di sicurezza, la coassialità geometrica tra le sedi dei due supporti ritti UCP204 sul telaio tubolare deve essere inferiore a <strong>0,05 mm</strong>. Errori di allineamento superiori generano sforzi di precarico radiale che bloccano l'albero di torsione.
+                </p>
+            </div>
+
+            <div class="image-card">
+                <div class="image-wrapper">
+                    <img src="../hardware/cad/blueprint_chassis_articulation.png" alt="Snodo Centrale Blueprint">
+                </div>
+                <div class="image-caption">
+                    Tavola Meccanica 2: Blueprint dello Snodo di Articolazione Centrale
+                    <span>Tavola costruttiva dello snodo di torsione con i supporti ritti UCP204 e le spine elastiche di sicurezza.</span>
+                </div>
+            </div>
+
+            <h3>2.3 Analisi Dinamica del Verricello ed Antiribaltamento</h3>
+            <p>
+                Nelle fasi di auto-soccorso o sollevamento di carichi pesanti su forti inclinazioni mediante il verricello anteriore (<code>rover_winch</code>), si genera una forte forza di trazione <code>T</code>. Se il punto di ancoraggio del verricello è situato troppo in alto rispetto al baricentro (CoG) del veicolo, si crea una coppia motrice che genera l'effetto <strong>Back-flip (Pitch-up)</strong>, sollevando le ruote anteriori.
+            </p>
+
+            <div class="equation-box">
+                <span class="equation-title">Equazione 2.2: Equilibrio dei Momenti sul Limite di Ribaltamento</span>
+                M_rib = T * h_w  &lt;  M_stab = (m * g * cos(θ)) * (W_b / 2)
+                <span class="equation-explain">Dove T è la tensione della corda, h_w l'altezza del verricello rispetto al mozzo, m la massa del rover, g l'accelerazione di gravità, θ la pendenza del terreno, e W_b l'interasse (wheelbase = 0.8 m).</span>
+            </div>
+
+            <p>
+                Il firmware del Mulo MK0, integrato nel nodo ROS 2 <code>winch_manager.py</code>, effettua un calcolo predittivo in tempo reale basato su questa equazione. Se l'angolo di beccheggio (<code>pitch</code>) letto dall'IMU aumenta bruscamente o la tensione stimata si avvicina al limite di stabilità dinamica, il sistema applica un freno elettrico istantaneo o rilascia la fune in sicurezza.
+            </p>
+
+            <div class="image-card">
+                <div class="image-wrapper">
+                    <img src="diagrams/plot_winch_tension_slope.png" alt="Grafico Forza Verricello">
+                </div>
+                <div class="image-caption">
+                    Grafico Fisico 1: Tensione Cavo Verricello vs Pendenza del Terreno
+                    <span>Le curve mostrano la tensione richiesta in Newton per carichi da 50 kg, 75 kg e 100 kg su pendenze da 0 a 45 gradi, definendo i limiti stabili operativi.</span>
+                </div>
+            </div>
+
+            <div class="image-card">
+                <div class="image-wrapper">
+                    <img src="../hardware/cad/blueprint_winch_assembly.png" alt="Blueprint Verricello">
+                </div>
+                <div class="image-caption">
+                    Tavola Meccanica 3: Blueprint Ingegneristico del Verricello
+                    <span>Disegno costruttivo del gruppo verricello anteriore, posizionato il più in basso possibile (vicino all'asse dei mozzi) per ridurre la leva di ribaltamento h_w.</span>
+                </div>
+            </div>
+
+            <!-- CAPITOLO 3 -->
+            <div class="page-break"></div>
+            <section id="cap3" class="section-header">
+                <span class="section-number">Capitolo 3</span>
+                <h2>Catena Cinematica ed Energia</h2>
+            </section>
+
+            <h3>3.1 Caratteristiche di Coppia e Gestione VESC</h3>
+            <p>
+                La propulsione del Mulo MK0 è affidata a 4 motori brushless con riduttore ad ingranaggi cilindrici (rapporto di riduzione di <code>71.5:1</code>). Il controllo di potenza avviene mediante controller <strong>Dual FSESC</strong> (basati sul firmware open-source VESC), che permettono una fine parzializzazione della corrente erogata alle fasi del motore e una frenatura rigenerativa sicura.
+            </p>
+
+            <div class="image-card">
+                <div class="image-wrapper">
+                    <img src="diagrams/plot_motor_torque_speed.png" alt="Curva Coppia Velocità">
+                </div>
+                <div class="image-caption">
+                    Grafico Fisico 2: Caratteristica Coppia-Velocità del Motore
+                    <span>Profilo prestazionale dei motori brushless a 24V. Si nota la zona a coppia costante ideale per lo spunto in salita e la curva di efficienza energetica con picco all'85%.</span>
+                </div>
+            </div>
+
+            <h3>3.2 Chimica LiFePO4 ed Autonomia</h3>
+            <p>
+                Il pacco batteria del rover adotta la chimica del <strong>Fosfato di Ferro e Litio (LiFePO4)</strong>. A differenza delle classiche celle LiPo o agli ioni di litio, il LiFePO4 garantisce una sicurezza intrinseca assoluta contro la fuga termica (thermal runaway) in caso di perforazione, oltre a una durata ciclica superiore alle 3000 cariche (al 80% DoD).
+            </p>
+            <p>
+                La tensione delle celle subisce un calo dinamico (voltage sag) all'aumentare della corrente di scarica, governata dall'equazione di Nernst accoppiata alla resistenza interna:
+            </p>
+
+            <div class="equation-box">
+                <span class="equation-title">Equazione 3.1: Tensione di Cella Sotto Carico</span>
+                V_cell = V_oc - I_d * R_int - η_act - η_conc
+                <span class="equation-explain">Dove V_oc è la tensione a circuito aperto, I_d la corrente di scarica, R_int la resistenza ohmica interna, η_act l'attivazione e η_conc la polarizzazione di concentrazione chimica.</span>
+            </div>
+
+            <div class="image-card">
+                <div class="image-wrapper">
+                    <img src="diagrams/plot_battery_discharge_soc.png" alt="Grafico Scarica Batteria">
+                </div>
+                <div class="image-caption">
+                    Grafico Fisico 3: Curve di Scarica della Batteria LiFePO4
+                    <span>Profilo di tensione al variare dello Stato di Carica (SoC) sotto diverse correnti di esercizio (0.2C di riposo, 0.5C nominale, 1C picco). La curva estremamente piatta garantisce una stabilità di potenza ottimale.</span>
+                </div>
+            </div>
+
+            <h3>3.3 Layout di Potenza e Ricarica IP68</h3>
+            <p>
+                Per far fronte a lunghi trekking in completa autonomia, il Mulo MK0 integra un sistema di alimentazione ridondante. Il caricabatterie intelligente Mean Well <strong>NPB-750-24</strong> gestisce la ricarica da generatore termico esterno o rete di officina, mentre il regolatore solare <strong>Victron MPPT</strong> sfrutta l'energia solare fotovoltaica.
+            </p>
+            <p>
+                Tutti i componenti elettronici critici sono montati all'interno di una scatola in alluminio a tenuta stagna IP68 sul semitelaio posteriore. La dissipazione del calore generato dal Mean Well NPB-750 è coadiuvata dal montaggio a diretto contatto con le pareti della scatola mediante un pad termoconduttivo da 2.0 mm, trasformando l'intero telaio tubolare in un dissipatore di calore passivo.
+            </p>
+
+            <div class="image-card">
+                <div class="image-wrapper">
+                    <img src="../hardware/cad/cad_power_box_assembly.png" alt="CAD Power Box">
+                </div>
+                <div class="image-caption">
+                    Tavola Meccanica 4: Spaccato CAD del Vano di Potenza e Ricarica
+                    <span>Layout tridimensionale interno con i silent-block anti-vibrazione, il passacavo AWG 10 e i connettori IP68 Neutrik powerCON TRUE1 e magnetico Rosenberger.</span>
+                </div>
+            </div>
+
+            <!-- CAPITOLO 4 -->
+            <div class="page-break"></div>
+            <section id="cap4" class="section-header">
+                <span class="section-number">Capitolo 4</span>
+                <h2>Algoritmi di Navigazione e Controllo</h2>
+            </section>
+
+            <h3>4.1 Trilaterazione Matematica UWB</h3>
+            <p>
+                Il sistema follow-me si basa sulla stima della posizione relativa dell'operatore umano dotato di un radio trasmettitore (Tag) rispetto a due ancore posizionate sul frontale del rover con una baseline fissa <code>W = 0,60 m</code>. Conoscendo le distanze <code>d1</code> e <code>d2</code> misurate tramite tempo di volo radio (ToF), la geometria trigonometrica definisce le coordinate del tag:
+            </p>
+
+            <div class="equation-box">
+                <span class="equation-title">Equazioni 4.1: Trilaterazione 2D e Stima della Posa</span>
+                x = (d1² - d2²) / (2 * W)
+                <br>
+                y = √(d1² - (x + W/2)²)
+                <span class="equation-explain">Dove x e y definiscono la posizione dell'operatore nel sistema di coordinate del rover.</span>
+            </div>
+
+            <p>
+                Tuttavia, all'aumentare della distanza <code>y</code> dall'asse del veicolo, piccoli errori di misura delle distanze generano una propagazione esponenziale dell'errore angolare, rendendo l'inseguimento instabile ad alte velocità.
+            </p>
+
+            <div class="image-card">
+                <div class="image-wrapper">
+                    <img src="diagrams/plot_uwb_trilateration_error.png" alt="Grafico Errore UWB">
+                </div>
+                <div class="image-caption">
+                    Grafico Fisico 4: Errore Angolare UWB vs Distanza
+                    <span>Il grafico illustra la deviazione dell'errore angolare stimato in gradi al crescere della distanza dal baseline. Definisce la soglia dei 3 metri per la navigazione a piena velocità.</span>
+                </div>
+            </div>
+
+            <h3>4.2 Fusione Sensoriale e Odometria FAST-LIO2</h3>
+            <p>
+                Per compensare l'instabilità del segnale UWB in zone d'ombra o boschi fitti, il firmware implementa un filtro di Kalman non lineare (<strong>Unscented Kalman Filter - UKF</strong>) che fonde la cinematica stimata della trilaterazione con i dati ad alta frequenza dell'unità di misura inerziale (<strong>IMU</strong>) a 6 assi e l'odometria calcolata dai motori.
+            </p>
+            <p>
+                In scenari ad alto rischio di smarrimento del segnale GPS o in ambienti fortemente degradati (fumo, polvere, buio pesto), la percezione primaria si sposta sull'odometria LiDAR-Inerziale ad accoppiamento stretto (tightly coupled) <strong>FAST-LIO2</strong>, che mappa l'ambiente in 3D in tempo reale garantendo un errore di deriva posizionale inferiore all'1%.
+            </p>
+
+            <div class="image-card">
+                <div class="image-wrapper">
+                    <img src="diagrams/render_mulo_trekking_alpine.png" alt="Render Trekking Alpino">
+                </div>
+                <div class="image-caption">
+                    Render Operativo: Navigazione in Ambiente Montano Autonoma
+                    <span>Il Mulo MK0 in azione lungo un sentiero accidentato alpino mentre applica i filtri di stima di stabilità torsionale e follow-me per seguire l'operatore in sicurezza.</span>
+                </div>
+            </div>
+
+            <!-- CAPITOLO 5 -->
+            <div class="page-break"></div>
+            <section id="cap5" class="section-header">
+                <span class="section-number">Capitolo 5</span>
+                <h2>Manuale Costruttivo di Officina</h2>
+            </section>
+
+            <h3>5.1 Distinta Base Ingegneristica (BOM)</h3>
+            <p>
+                Questo elenco indica i materiali e i componenti da reperire per la costruzione fisica del prototipo.
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Codice Componente</th>
+                        <th>Descrizione Materiale</th>
+                        <th>Quantità</th>
+                        <th>Trattamento / Standard Tecnico</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>TEL-30302-S235</strong></td>
+                        <td>Profilato tubolare d'acciaio 30x30x2 mm</td>
+                        <td>12 metri</td>
+                        <td>Taglio a 45°, saldatura MIG/MAG d'officina, verniciatura a polvere nero opaco.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ALB-42CRMO4-C</strong></td>
+                        <td>Albero di trasmissione custom (flangia 6 fori)</td>
+                        <td>4 unità</td>
+                        <td>Bonificato, tornitura CNC con sede chiavetta DIN 6885A e rettifica a diametro 20 mm <code>h6</code>.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CUS-UCF204</strong></td>
+                        <td>Cuscinetto flangiato in ghisa a 4 fori</td>
+                        <td>4 unità</td>
+                        <td>Standard UCF204, foro 20 mm, lubrificazione a grasso al litio ad alte prestazioni.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CUS-UCP204</strong></td>
+                        <td>Cuscinetto a supporto ritto (snodo centrale)</td>
+                        <td>2 unità</td>
+                        <td>Standard UCP204, fissaggio filettato M10 ad alta resistenza (classe 8.8).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DIS-203-BB7</strong></td>
+                        <td>Freno a disco Avid BB7 da 203 mm</td>
+                        <td>4 unità</td>
+                        <td>Fissaggio 6 fori IS su flangia albero, pinza meccanica a doppio pistone.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CON-TRUE1-NET</strong></td>
+                        <td>Connettore Neutrik powerCON TRUE1 TOP</td>
+                        <td>1 unità</td>
+                        <td>Flangia stagna IP65/IP66 con protezione UV ed elettrica fino a 16 A.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>BAT-LFP-24V</strong></td>
+                        <td>Batteria LiFePO4 24 V con BMS</td>
+                        <td>1 unità</td>
+                        <td>Capacita' finale 50-100 Ah secondo peso reale; BMS con protezione temperatura e corrente continua documentata.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SAFE-MCU-STM32</strong></td>
+                        <td>Microcontrollore safety real-time</td>
+                        <td>1 unità</td>
+                        <td>Watchdog hardware, input E-stop, consenso motori fail-safe, heartbeat verso ROS 2.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DUMP-24V-BRAKE</strong></td>
+                        <td>Resistenza di frenatura / dump load</td>
+                        <td>1 unità</td>
+                        <td>Carter ventilato, fusibile dedicato, montaggio lontano da cavi e plastiche.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SENS-THERM-KIT</strong></td>
+                        <td>Sonde termiche per VESC, motori e batteria</td>
+                        <td>6-8 unità</td>
+                        <td>NTC/PT100 o sensori compatibili con controller; soglie warn/fault da tarare a banco.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>WIRE-IP68-KIT</strong></td>
+                        <td>Cablaggio potenza/segnale rugged</td>
+                        <td>1 set</td>
+                        <td>Cavi dimensionati per corrente continua, CAN twistato, pressacavi, guaine antiabrasione e strain relief.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="manual-note">
+                <p>
+                    <strong>Nota acquisti:</strong> non comprare componenti critici solo per potenza di picco o descrizioni commerciali. Per batteria, VESC, motori, dump load e DC-DC servono dati continui, temperatura ammessa, metodo di montaggio, schema di collegamento e prova di accettazione.
+                </p>
+            </div>
+
+            <h3>5.2 Sequenza di Assemblaggio Passo-Passo</h3>
+            <ul class="assembly-list">
+                <li>
+                    <div class="assembly-step-num">1</div>
+                    <div class="assembly-step-title">Carpenteria Metallica del Telaio</div>
+                    Tagliare i profilati in acciaio <code>S235</code> secondo le quote del layout. Effettuare la saldatura <code>MIG/MAG</code> dei due semitelai (anteriore e posteriore). Saldare le controventature diagonali da 20x20 mm per evitare torsioni indesiderate della struttura portante.
+                </li>
+                <li>
+                    <div class="assembly-step-num">2</div>
+                    <div class="assembly-step-title">Costruzione dello Snodo di Torsione</div>
+                    Inserire l'albero di torsione da 20 mm all'interno dei due supporti ritti UCP204 posizionati sul semitelaio. Verificare con il comparatore centesimale che l'allineamento coassiale sia entro i <strong>0,05 mm</strong>. Fissare i cuscinetti al telaio e inserire la spina di sicurezza rapida con coppiglia elastica.
+                </li>
+                <li>
+                    <div class="assembly-step-num">3</div>
+                    <div class="assembly-step-title">Assemblaggio Sandwich della Trasmissione</div>
+                    Fissare la piastra da 6 mm al telaio. Imbullonare il motore brushless da 200W all'interno e il cuscinetto UCF204 flangiato all'esterno. Calettare l'albero custom in <code>42CrMo4</code> sull'albero motore inserendo la chiavetta a linguetta. Serrare il grano del cuscinetto UCF204 per bloccare l'albero.
+                </li>
+                <li>
+                    <div class="assembly-step-num">4</div>
+                    <div class="assembly-step-title">Installazione Ruote e Impianto Frenante</div>
+                    Imbullonare il disco freno da 203 mm e il mozzo della ruota da 20 pollici sulla flangia esterna dell'albero in 42CrMo4 mediante 6 bulloni ad alta resistenza serrati a 10 Nm. Montare la pinza Avid BB7 sulla staffa dedicata e tendere il cavo Bowden della leva freno di stazionamento.
+                </li>
+                <li>
+                    <div class="assembly-step-num">5</div>
+                    <div class="assembly-step-title">Cablaggio e Scatola Elettronica IP68</div>
+                    Posizionare l'alimentatore Mean Well NPB-750 e il regolatore MPPT Victron nella scatola posteriore in alluminio. Interporre il pad termico da 2.0 mm sul fondo piatto. Effettuare i collegamenti elettrici stagne e connettere il bus di comunicazione CAN.
+                </li>
+                <li>
+                    <div class="assembly-step-num">6</div>
+                    <div class="assembly-step-title">Safety Prima Accensione</div>
+                    Collegare E-stop, sezionatore, fusibili e consenso motori prima dei comandi ROS. Con le ruote sollevate, verificare che E-stop, timeout comando, perdita CAN e spegnimento computer portino i VESC in stato senza coppia.
+                </li>
+                <li>
+                    <div class="assembly-step-num">7</div>
+                    <div class="assembly-step-title">Taratura Freni e Stazionamento</div>
+                    Regolare le pinze meccaniche, centrare i dischi e segnare la posizione delle leve. Eseguire la prova statica con massa simulata prima di qualunque discesa reale.
+                </li>
+                <li>
+                    <div class="assembly-step-num">8</div>
+                    <div class="assembly-step-title">Logging e Primo Movimento</div>
+                    Abilitare log di corrente, tensione, temperatura, RPM, fault VESC e stato safety. Il primo movimento deve avvenire a corrente limitata, velocita' bassa e spazio libero.
+                </li>
+            </ul>
+
+            <h3>5.3 Schema di Cablaggio e Pinout ESP32-S3</h3>
+            <p>
+                Il microcontrollore centrale ESP32-S3 gestisce l'acquisizione a basso livello dei sensori di sicurezza ToF, le ancore UWB e comunica tramite interfaccia seriale/CAN con i driver VESC. Di seguito viene riportata la tabella di cablaggio di riferimento per il cablatore d'officina:
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pin ESP32-S3</th>
+                        <th>Nome Segnale</th>
+                        <th>Dispositivo Connesso</th>
+                        <th>Colore Cavo</th>
+                        <th>Tipo Interfaccia / Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>GPIO 4</strong></td>
+                        <td>CAN_TX</td>
+                        <td>Transceiver CAN (SN65HVD230)</td>
+                        <td>Giallo</td>
+                        <td>Bus CAN per comunicazione Dual VESC, 500 kbps.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GPIO 5</strong></td>
+                        <td>CAN_RX</td>
+                        <td>Transceiver CAN (SN65HVD230)</td>
+                        <td>Verde</td>
+                        <td>Bus CAN per comunicazione Dual VESC, 500 kbps.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GPIO 8</strong></td>
+                        <td>I2C_SDA</td>
+                        <td>Unità Inerziale IMU (BMI088) / ToF</td>
+                        <td>Blu</td>
+                        <td>Bus I2C primario, resistenza di pull-up da 4.7 kΩ.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GPIO 9</strong></td>
+                        <td>I2C_SCL</td>
+                        <td>Unità Inerziale IMU (BMI088) / ToF</td>
+                        <td>Bianco</td>
+                        <td>Bus I2C primario, clock a 400 kHz.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GPIO 18</strong></td>
+                        <td>UWB_TX</td>
+                        <td>Decawave DWM1000 (Ancora A)</td>
+                        <td>Grigio</td>
+                        <td>Interfaccia UART seriale a 115200 bps.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GPIO 19</strong></td>
+                        <td>UWB_RX</td>
+                        <td>Decawave DWM1000 (Ancora A)</td>
+                        <td>Marrone</td>
+                        <td>Interfaccia UART seriale a 115200 bps.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GPIO 21</strong></td>
+                        <td>ESTOP_SIG</td>
+                        <td>Circuito Estop di Sicurezza (Relè)</td>
+                        <td>Rosso/Nero</td>
+                        <td>Input digitale (Pull-up attivo). Se a 0V arresta la coppia.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>5.4 Regole di Cablaggio da Officina</h3>
+            <div class="two-column">
+                <div class="work-card">
+                    <span class="work-label">Potenza</span>
+                    <h4>Bus DC e rami protetti</h4>
+                    <p>Ogni ramo critico deve avere protezione dedicata: VESC, carica, DC-DC servizi, dump load e computer. Il sezionatore deve essere raggiungibile senza aprire box complessi.</p>
+                    <span class="status-pill status-p0">P0</span>
+                    <span class="status-pill">batteria</span>
+                    <span class="status-pill">fusibili</span>
+                </div>
+                <div class="work-card">
+                    <span class="work-label">Segnali</span>
+                    <h4>CAN e sensori separati</h4>
+                    <p>Il CAN dei VESC va twistato, terminato e tenuto lontano dai cavi fase motore. I sensori safety devono avere connettori bloccabili e scarico trazione, non cavetti liberi.</p>
+                    <span class="status-pill status-p0">P0</span>
+                    <span class="status-pill">CAN</span>
+                    <span class="status-pill">IP67/IP68</span>
+                </div>
+            </div>
+
+            <h3>5.5 Scheda Lavorazione per il Carpentiere</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pezzo</th>
+                        <th>Lavorazione richiesta</th>
+                        <th>Controllo prima del montaggio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Semitelai S235</td>
+                        <td>Taglio tubolari 30x30x2 mm, dime di saldatura, cordoni continui dove richiesto, punti di fissaggio per piastre.</td>
+                        <td>Diagonali uguali, assi ruota paralleli, nessuna torsione visibile su piano di riferimento.</td>
+                    </tr>
+                    <tr>
+                        <td>Piastre ruota 6 mm</td>
+                        <td>Foratura per motore, UCF204, staffa freno, passaggio cavi e protezione anti-fango.</td>
+                        <td>Coassialita' motore-cuscinetto, planarita' di appoggio, accesso chiave per manutenzione.</td>
+                    </tr>
+                    <tr>
+                        <td>Alberi 42CrMo4</td>
+                        <td>Tornitura, sede chiavetta DIN 6885A, flangia 6 fori, rettifica diametro 20 mm h6.</td>
+                        <td>Scorrimento nel cuscinetto senza gioco percepibile, flangia senza eccentricita' anomala.</td>
+                    </tr>
+                    <tr>
+                        <td>Snodo centrale</td>
+                        <td>Supporti UCP204 allineati su dima, perno centrale, spine quick-split e finecorsa meccanici.</td>
+                        <td>Rotazione libera, sfilamento manuale possibile, nessun precarico radiale sui cuscinetti.</td>
+                    </tr>
+                    <tr>
+                        <td>Staffa verricello</td>
+                        <td>Montaggio basso e rinforzato, piastra di ripartizione, protezione cavo e punto guida fune.</td>
+                        <td>Linea di tiro vicina all'asse mozzi, nessuna interferenza con ruote o snodo.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- CAPITOLO 6 -->
+            <div class="page-break"></div>
+            <section id="cap6" class="section-header">
+                <span class="section-number">Capitolo 6</span>
+                <h2>Roadmap dei Lavori e Ordine di Costruzione</h2>
+            </section>
+
+            <p>
+                La costruzione va affrontata come una sequenza di blocchi verificabili. Ogni fase chiude un rischio concreto prima di aprire il successivo: prima telaio e sicurezza fisica, poi potenza, poi firmware, infine autonomia.
+            </p>
+
+            <div class="phase-grid">
+                <div class="phase-card">
+                    <span class="phase-label">Fase 0</span>
+                    <h4>Baseline dati e acquisti</h4>
+                    <p>Congelare BOM, quote, schema elettrico, limiti software e piano test. Output: distinta ordinabile e schema di potenza validato su carta.</p>
+                    <span class="status-pill status-p0">P0</span>
+                </div>
+                <div class="phase-card">
+                    <span class="phase-label">Fase 1</span>
+                    <h4>Rolling chassis</h4>
+                    <p>Costruire semitelai, snodo, ponti corazzati, ruote e freni. Output: rover trainabile, bloccabile e ispezionabile.</p>
+                    <span class="status-pill status-p0">P0</span>
+                </div>
+                <div class="phase-card">
+                    <span class="phase-label">Fase 2</span>
+                    <h4>Potenza e trazione base</h4>
+                    <p>Installare batteria, sezionatore, fusibili, VESC, CAN, DC-DC e dump load. Output: movimento lento con ruote sollevate e stop indipendente.</p>
+                    <span class="status-pill status-p0">P0</span>
+                </div>
+                <div class="phase-card">
+                    <span class="phase-label">Fase 3</span>
+                    <h4>MCU safety e firmware</h4>
+                    <p>Implementare heartbeat, timeout, E-stop, soglie IMU/ToF, stato fault e consenso motori. Output: test HIL superati.</p>
+                    <span class="status-pill status-p0">P0</span>
+                </div>
+                <div class="phase-card">
+                    <span class="phase-label">Fase 4</span>
+                    <h4>Follow-me UWB</h4>
+                    <p>Calibrare anchor, filtri outlier, distanza di sicurezza e perdita tag. Output: follow-me lento in area aperta e stop su incoerenza.</p>
+                    <span class="status-pill status-p1">P1</span>
+                </div>
+                <div class="phase-card">
+                    <span class="phase-label">Fase 5</span>
+                    <h4>Autonomia assistita</h4>
+                    <p>Integrare LiDAR/camera, log ROS 2, terrain assessment e mission logic. Output: prove outdoor progressive con dati.</p>
+                    <span class="status-pill status-p1">P1</span>
+                </div>
+            </div>
+
+            <h3>6.1 Work Package Operativi</h3>
+            <div class="work-grid">
+                <div class="work-card">
+                    <span class="work-label">WP-MEC</span>
+                    <h4>Meccanica e carpenteria</h4>
+                    <p>Responsabile di telaio, piastre, alberi, snodo, freni, supporti sensori e accesso manutenzione. Non chiude finche' il rover non si puo' trainare e bloccare.</p>
+                </div>
+                <div class="work-card">
+                    <span class="work-label">WP-PWR</span>
+                    <h4>Energia e protezioni</h4>
+                    <p>Responsabile di batteria, BMS, fusibili, sezionatore, DC-DC, dump load, ricarica e dissipazione. Non chiude senza test termico e rigenerazione.</p>
+                </div>
+                <div class="work-card">
+                    <span class="work-label">WP-CTRL</span>
+                    <h4>Controllo motori</h4>
+                    <p>Responsabile di VESC, CAN, telemetria, limiti corrente, comando velocita', fault code e modalita' degradata. Non chiude senza log di banco.</p>
+                </div>
+                <div class="work-card">
+                    <span class="work-label">WP-SAFE</span>
+                    <h4>Safety indipendente</h4>
+                    <p>Responsabile di E-stop, watchdog, MCU, ToF safety, IMU, timeout e consenso motori. E' il pacchetto che decide quando il rover non deve muoversi.</p>
+                </div>
+                <div class="work-card">
+                    <span class="work-label">WP-NAV</span>
+                    <h4>Navigazione e follow-me</h4>
+                    <p>Responsabile di UWB, GNSS/log, fusione sensori, limiti velocita' e comportamento su target perso. Non deve bypassare WP-SAFE.</p>
+                </div>
+                <div class="work-card">
+                    <span class="work-label">WP-DOC</span>
+                    <h4>Documentazione e dati</h4>
+                    <p>Responsabile di BOM, foto montaggio, schemi, checklist, rosbag/log e verbali di collaudo. Senza evidenza, una prova non e' chiusa.</p>
+                </div>
+            </div>
+
+            <h3>6.2 Cosa Costruire Prima, in Pratica</h3>
+            <ul class="checklist">
+                <li>Prima settimana: BOM reale, schema elettrico P0, dima telaio, lista utensili, disegni quotati essenziali.</li>
+                <li>Seconda settimana: semitelai saldati, piastre ruota forate, snodo montato a secco, verifica ingombri ruote e freni.</li>
+                <li>Terza settimana: alberi, cuscinetti, ruote, freni e prova rolling chassis senza elettronica.</li>
+                <li>Quarta settimana: box potenza, batteria protetta, fusibili, sezionatore, DC-DC, E-stop e test continuita'.</li>
+                <li>Quinta settimana: VESC/CAN su ruote sollevate, limiti corrente bassi, log, stop fault e test perdita comando.</li>
+                <li>Sesta settimana: prima marcia lenta, frenata, salita leggera, termica e revisione bulloneria.</li>
+            </ul>
+
+            <!-- CAPITOLO 7 -->
+            <div class="page-break"></div>
+            <section id="cap7" class="section-header">
+                <span class="section-number">Capitolo 7</span>
+                <h2>Collaudo, Diagnostica e Prove sul Campo</h2>
+            </section>
+
+            <p>
+                Il collaudo del Mulo non deve cercare il caso spettacolare, ma ripetere casi semplici finche' diventano noiosi. Un rover affidabile nasce quando ogni fault viene visto, registrato e trasformato in soglia o modifica fisica.
+            </p>
+
+            <div class="test-grid">
+                <div class="test-card">
+                    <h4>Test A - Continuita' e isolamento</h4>
+                    <p>Controllare polarita', fusibili, massa, bus DC, CAN, E-stop e assenza corti prima di collegare batteria piena.</p>
+                </div>
+                <div class="test-card">
+                    <h4>Test B - Ruote sollevate</h4>
+                    <p>Comando RPM basso, inversione, stop, fault simulato, perdita CAN, perdita heartbeat e spegnimento computer.</p>
+                </div>
+                <div class="test-card">
+                    <h4>Test C - Frenata e stazionamento</h4>
+                    <p>Rover spento su pendenza controllata, poi frenata dinamica lenta con massa simulata e verifica riscaldamento dischi.</p>
+                </div>
+                <div class="test-card">
+                    <h4>Test D - Termica salita lenta</h4>
+                    <p>Marcia a bassa velocita' con carico, logging temperature motori/VESC/batteria e derating progressivo.</p>
+                </div>
+                <div class="test-card">
+                    <h4>Test E - Rigenerazione e dump load</h4>
+                    <p>Discesa controllata con batteria alta, monitor bus DC e attivazione dump load senza sovratensione.</p>
+                </div>
+                <div class="test-card">
+                    <h4>Test F - Follow-me UWB</h4>
+                    <p>Distanza target, perdita tag, operatore troppo vicino, cambio direzione e outlier. La risposta corretta e' rallenta/stop.</p>
+                </div>
+            </div>
+
+            <h3>7.1 Log Minimo Obbligatorio</h3>
+            <table class="acceptance-table">
+                <thead>
+                    <tr>
+                        <th>Dato</th>
+                        <th>Perche' serve</th>
+                        <th>Frequenza consigliata</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>V_bus, I_bus, SoC</td>
+                        <td>Capire cadute tensione, assorbimenti reali, cut-off BMS e autonomia.</td>
+                        <td>5-20 Hz</td>
+                    </tr>
+                    <tr>
+                        <td>RPM, corrente, fault VESC</td>
+                        <td>Diagnosticare stallo, perdita CAN, surriscaldamento e differenze tra ruote.</td>
+                        <td>20 Hz</td>
+                    </tr>
+                    <tr>
+                        <td>Temperature</td>
+                        <td>Validare dissipazione e derating prima del fault critico.</td>
+                        <td>1-5 Hz</td>
+                    </tr>
+                    <tr>
+                        <td>Safety state</td>
+                        <td>Dimostrare perche' il rover ha permesso o negato la coppia motore.</td>
+                        <td>10-20 Hz</td>
+                    </tr>
+                    <tr>
+                        <td>UWB/GNSS/IMU</td>
+                        <td>Ricostruire target, inclinazione, perdita segnale e condizioni del percorso.</td>
+                        <td>10-50 Hz secondo sensore</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>7.2 Criteri Go / No-Go per Uscire dall'Officina</h3>
+            <ul class="checklist">
+                <li>E-stop fisico provato almeno 10 volte, anche durante comando motore attivo.</li>
+                <li>Timeout comando verificato: se ROS/Jetson smette di parlare, i motori vanno a zero.</li>
+                <li>Freni meccanici capaci di bloccare il rover spento su pendenza controllata.</li>
+                <li>Cablaggio fissato: nessun cavo sfrega su ruote, dischi, snodo, alberi o parti calde.</li>
+                <li>Log leggibile salvato per almeno 15 minuti senza corruzione o perdita dati.</li>
+                <li>Limiti di corrente iniziali conservativi impostati nei VESC e documentati.</li>
+            </ul>
+
+            <!-- CAPITOLO 8 -->
+            <div class="page-break"></div>
+            <section id="cap8" class="section-header">
+                <span class="section-number">Capitolo 8</span>
+                <h2>Sicurezza, Manutenzione e Firma di Avanzamento</h2>
+            </section>
+
+            <h3>8.1 Rischi Principali e Mitigazioni</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rischio</th>
+                        <th>Mitigazione tecnica</th>
+                        <th>Verifica</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Movimento non comandato</td>
+                        <td>E-stop, consenso motori fail-safe, watchdog MCU, timeout comandi.</td>
+                        <td>Test perdita heartbeat e spegnimento computer durante comando attivo.</td>
+                    </tr>
+                    <tr>
+                        <td>Perdita frenata in discesa</td>
+                        <td>Freni meccanici + rigenerazione VESC + dump load con batteria alta.</td>
+                        <td>Discesa controllata e prova stazionamento a batteria spenta.</td>
+                    </tr>
+                    <tr>
+                        <td>Surriscaldamento</td>
+                        <td>Sonde su VESC/motori/batteria, dissipatori, derating e log.</td>
+                        <td>Salita lenta a carico, soglie warn/fault e ispezione termica.</td>
+                    </tr>
+                    <tr>
+                        <td>Guasto cablaggio</td>
+                        <td>Connettori bloccabili, guaine, strain relief, separazione potenza/segnale.</td>
+                        <td>Test vibrazione manuale, continuita' e ispezione dopo ogni uscita.</td>
+                    </tr>
+                    <tr>
+                        <td>Follow-me instabile</td>
+                        <td>Filtri UWB, rejection outlier, distanza minima, stop su incoerenza.</td>
+                        <td>Prove con perdita tag, ostacolo, target troppo vicino e cambio direzione.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>8.2 Manutenzione Prima e Dopo Ogni Uscita</h3>
+            <div class="two-column">
+                <div class="work-card">
+                    <span class="work-label">Prima uscita</span>
+                    <h4>Controlli rapidi</h4>
+                    <ul class="checklist">
+                        <li>Bulloneria ruote, piastre, UCF204, UCP204 e staffe freno.</li>
+                        <li>Stato freni, cavi Bowden, serraggio pinze e usura dischi.</li>
+                        <li>Batteria fissata, connettori chiusi, pressacavi serrati.</li>
+                        <li>E-stop e sezionatore provati prima di armare i motori.</li>
+                    </ul>
+                </div>
+                <div class="work-card">
+                    <span class="work-label">Dopo uscita</span>
+                    <h4>Rientro e diagnosi</h4>
+                    <ul class="checklist">
+                        <li>Scaricare log e annotare luogo, carico, durata, pendenza e fault.</li>
+                        <li>Controllare temperature massime e corrente di picco.</li>
+                        <li>Ispezionare cavi vicino a ruote, snodo, box potenza e VESC.</li>
+                        <li>Pulire fango da freni, cuscinetti, connettori e sensori frontali.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>8.3 Firma di Avanzamento Progetto</h3>
+            <p>
+                Ogni fase va chiusa con una firma tecnica interna. Non serve burocrazia pesante: serve impedire che il rover venga portato sul campo con rischi noti ma non risolti.
+            </p>
+            <div class="signoff-grid">
+                <div class="signoff-card">
+                    <h4>Meccanica chiusa</h4>
+                    <p>Telaio, snodo, ruote, freni e traino manuale verificati.</p>
+                    <div class="signature-line">Firma / data</div>
+                </div>
+                <div class="signoff-card">
+                    <h4>Potenza chiusa</h4>
+                    <p>Batteria, fusibili, sezionatore, VESC, DC-DC e dump load verificati.</p>
+                    <div class="signature-line">Firma / data</div>
+                </div>
+                <div class="signoff-card">
+                    <h4>Safety chiusa</h4>
+                    <p>E-stop, watchdog, timeout, log fault e stop indipendente verificati.</p>
+                    <div class="signature-line">Firma / data</div>
+                </div>
+            </div>
+
+            <p style="text-align: center; margin-top: 5rem; color: var(--text-muted); font-size: 0.85rem;">
+                © 2026 Axiom Rover - Tutti i diritti riservati. Documentazione Tecnica Interna.
+            </p>
+
+        </main>
+    </div>
+
+</body>
+</html>
+

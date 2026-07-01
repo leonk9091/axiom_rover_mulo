@@ -206,3 +206,200 @@ class MissionEnergySupervisor:
             estimated_runtime_s=estimated_runtime_s,
             thermal_derate=thermal_derate,
         )
+
+
+REX_STATE_DISABLED = 0
+REX_STATE_IDLE = 1
+REX_STATE_SPOOL_UP = 2
+REX_STATE_GENERATING = 3
+REX_STATE_COOLDOWN = 4
+REX_STATE_FAULT = 5
+
+REX_FAULT_NONE = 0
+REX_FAULT_DISABLED = 1
+REX_FAULT_SOC_HIGH = 2
+REX_FAULT_BUS_OVERVOLTAGE = 3
+REX_FAULT_RPM_OVERSPEED = 4
+REX_FAULT_DC_LINK_OVERVOLTAGE = 5
+REX_FAULT_NO_CHARGE_CURRENT = 6
+REX_FAULT_THERMAL_DERATE = 7
+
+REX_STATE_LABELS = {
+    REX_STATE_DISABLED: "DISABLED",
+    REX_STATE_IDLE: "IDLE",
+    REX_STATE_SPOOL_UP: "SPOOL_UP",
+    REX_STATE_GENERATING: "GENERATING",
+    REX_STATE_COOLDOWN: "COOLDOWN",
+    REX_STATE_FAULT: "FAULT",
+}
+
+REX_FAULT_LABELS = {
+    REX_FAULT_NONE: "NONE",
+    REX_FAULT_DISABLED: "DISABLED",
+    REX_FAULT_SOC_HIGH: "SOC_HIGH",
+    REX_FAULT_BUS_OVERVOLTAGE: "BUS_OVERVOLTAGE",
+    REX_FAULT_RPM_OVERSPEED: "RPM_OVERSPEED",
+    REX_FAULT_DC_LINK_OVERVOLTAGE: "DC_LINK_OVERVOLTAGE",
+    REX_FAULT_NO_CHARGE_CURRENT: "NO_CHARGE_CURRENT",
+    REX_FAULT_THERMAL_DERATE: "THERMAL_DERATE",
+}
+
+
+@dataclass(frozen=True)
+class RangeExtenderSnapshot:
+    state: int
+    fault_code: int
+    state_label: str
+    fault_label: str
+    reason: str
+    engine_start_request: bool
+    engine_kill_request: bool
+    generation_enable: bool
+    dump_load_request: bool
+    generator_power_target_w: float
+    charge_current_target_a: float
+    throttle_request: float
+
+
+class RangeExtenderSupervisor:
+    """Fail-closed supervisor for the Honda GX50 range extender."""
+
+    def __init__(
+        self,
+        enabled: bool = False,
+        max_power_w: float = 700.0,
+        max_charge_current_a: float = 24.0,
+        min_soc_start: float = 0.25,
+        stop_soc: float = 0.90,
+        bus_voltage_max_v: float = 29.2,
+        dc_link_max_v: float = 70.0,
+        rpm_max: float = 7500.0,
+        thermal_min_headroom: float = 0.35,
+        clutch_engage_rpm: float = 4400.0,
+    ):
+        self.enabled = enabled
+        self.max_power_w = max_power_w
+        self.max_charge_current_a = max_charge_current_a
+        self.min_soc_start = min_soc_start
+        self.stop_soc = stop_soc
+        self.bus_voltage_max_v = bus_voltage_max_v
+        self.dc_link_max_v = dc_link_max_v
+        self.rpm_max = rpm_max
+        self.thermal_min_headroom = thermal_min_headroom
+        self.clutch_engage_rpm = clutch_engage_rpm
+
+    def evaluate(
+        self,
+        requested_power_w: float,
+        soc: float,
+        bus_voltage_v: float,
+        thermal_headroom: float,
+        measured_charge_current_a: float = 0.0,
+        rpm: float = 0.0,
+        dc_link_voltage_v: float = 0.0,
+        dump_load_request: bool = False,
+        no_charge_current_fault: bool = False,
+    ) -> RangeExtenderSnapshot:
+        fault_code = REX_FAULT_NONE
+        reason = "ready"
+        state = REX_STATE_IDLE
+
+        if not self.enabled:
+            fault_code = REX_FAULT_DISABLED
+            reason = "range extender disabled by profile"
+        elif soc >= self.stop_soc:
+            fault_code = REX_FAULT_SOC_HIGH
+            reason = "battery soc above generator stop threshold"
+        elif bus_voltage_v >= self.bus_voltage_max_v:
+            fault_code = REX_FAULT_BUS_OVERVOLTAGE
+            reason = "24v bus above generator limit"
+        elif rpm > self.rpm_max:
+            fault_code = REX_FAULT_RPM_OVERSPEED
+            reason = "gx50/alternator rpm overspeed"
+        elif dc_link_voltage_v > self.dc_link_max_v:
+            fault_code = REX_FAULT_DC_LINK_OVERVOLTAGE
+            reason = "rectified dc link above limit"
+        elif no_charge_current_fault:
+            fault_code = REX_FAULT_NO_CHARGE_CURRENT
+            reason = "no charge current while gx50 clutch should be engaged"
+        elif thermal_headroom < self.thermal_min_headroom:
+            fault_code = REX_FAULT_THERMAL_DERATE
+            reason = "thermal headroom below generator threshold"
+
+        if fault_code != REX_FAULT_NONE:
+            state = REX_STATE_DISABLED if fault_code == REX_FAULT_DISABLED else REX_STATE_FAULT
+            return self._snapshot(
+                state=state,
+                fault_code=fault_code,
+                reason=reason,
+                engine_start_request=False,
+                engine_kill_request=fault_code != REX_FAULT_DISABLED,
+                generation_enable=False,
+                dump_load_request=dump_load_request,
+                generator_power_target_w=0.0,
+                charge_current_target_a=0.0,
+                throttle_request=0.0,
+            )
+
+        target_power = clamp(requested_power_w, 0.0, self.max_power_w)
+        if target_power <= 20.0 and soc > self.min_soc_start:
+            return self._snapshot(
+                state=REX_STATE_IDLE,
+                fault_code=REX_FAULT_NONE,
+                reason="generator demand below start threshold",
+                engine_start_request=False,
+                engine_kill_request=False,
+                generation_enable=False,
+                dump_load_request=dump_load_request,
+                generator_power_target_w=0.0,
+                charge_current_target_a=0.0,
+                throttle_request=0.0,
+            )
+
+        charge_current = clamp(
+            target_power / max(bus_voltage_v, 1.0),
+            0.0,
+            self.max_charge_current_a,
+        )
+        state = REX_STATE_GENERATING if measured_charge_current_a > 0.5 else REX_STATE_SPOOL_UP
+        throttle = clamp(target_power / max(self.max_power_w, 1.0), 0.15, 1.0)
+        return self._snapshot(
+            state=state,
+            fault_code=REX_FAULT_NONE,
+            reason="closed-loop current generation requested",
+            engine_start_request=True,
+            engine_kill_request=False,
+            generation_enable=True,
+            dump_load_request=dump_load_request,
+            generator_power_target_w=target_power,
+            charge_current_target_a=charge_current,
+            throttle_request=throttle,
+        )
+
+    def _snapshot(
+        self,
+        state: int,
+        fault_code: int,
+        reason: str,
+        engine_start_request: bool,
+        engine_kill_request: bool,
+        generation_enable: bool,
+        dump_load_request: bool,
+        generator_power_target_w: float,
+        charge_current_target_a: float,
+        throttle_request: float,
+    ) -> RangeExtenderSnapshot:
+        return RangeExtenderSnapshot(
+            state=state,
+            fault_code=fault_code,
+            state_label=REX_STATE_LABELS[state],
+            fault_label=REX_FAULT_LABELS[fault_code],
+            reason=reason,
+            engine_start_request=engine_start_request,
+            engine_kill_request=engine_kill_request,
+            generation_enable=generation_enable,
+            dump_load_request=dump_load_request,
+            generator_power_target_w=generator_power_target_w,
+            charge_current_target_a=charge_current_target_a,
+            throttle_request=throttle_request,
+        )

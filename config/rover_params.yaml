@@ -27,7 +27,10 @@ hardware_bridge:
     battery_stale_s: 1.5
     link_stale_s: 1.5
     thermal_headroom_default: 1.0
-    simulate_without_serial: true
+    simulate_without_serial: false
+    allow_unsigned_mcu_status: false
+    command_timeout_ms: 250
+    max_current_a: 18.0
 
 state_estimation:
   ros__parameters:
@@ -55,6 +58,7 @@ vesc_driver:
     temp_esc_fault_c: 85.0
     voltage_min_v: 20.0
     voltage_max_v: 29.4
+    simulate_without_can: false
 
 # ---------------------------------------------------------------------------
 # Winch Manager
@@ -100,6 +104,18 @@ power_monitor:
     ice_power_max_w: 800.0
     ice_power_optimal_w: 500.0
     ice_eta_optimal: 0.28
+    # Honda GX50 range extender supervisory gate.
+    range_extender_enabled: false
+    range_extender_max_power_w: 700.0
+    range_extender_max_charge_current_a: 24.0
+    range_extender_min_soc_start: 0.25
+    range_extender_stop_soc: 0.90
+    range_extender_bus_voltage_max_v: 29.2
+    range_extender_dc_link_max_v: 70.0
+    range_extender_rpm_max: 7500.0
+    range_extender_clutch_engage_rpm: 4400.0
+    range_extender_no_charge_timeout_s: 2.0
+    range_extender_thermal_min_headroom: 0.35
     # ECMS
     ecms_s0: 2.5
     ecms_soc_ref: 0.60
@@ -133,6 +149,27 @@ person_following:
     # Terrain classifier
     terrain_model_path: "models/terrain_classifier_mobilenetv3.pth"
     terrain_confidence_threshold: 0.7
+
+# ---------------------------------------------------------------------------
+# Laser Target Detector
+# ---------------------------------------------------------------------------
+laser_target_detector:
+  ros__parameters:
+    hsv_h_min: 35
+    hsv_h_max: 85
+    hsv_s_min: 100
+    hsv_s_max: 255
+    hsv_v_min: 150
+    hsv_v_max: 255
+    min_target_area: 4.0
+    max_target_area: 500.0
+    depth_neighborhood: 3
+    publish_debug_img: true
+    # Geometria camera (RealSense D435i inclinata a 15 gradi)
+    camera_pitch_rad: 0.26
+    camera_x_m: 0.42
+    camera_y_m: 0.0
+    camera_z_m: 0.32
 
 # ---------------------------------------------------------------------------
 # Safety Watchdog

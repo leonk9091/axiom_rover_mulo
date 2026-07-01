@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "filename": "mulo_rex_controller.kicad_pro",
+    "version": 1
+  },
+  "sheets": [
+    [
+      "0f4aa8aa-27a8-4c7c-8d26-6f0104bd52cc",
+      "Root"
+    ]
+  ],
+  "text_variables": {
+    "PROJECT": "MULO-REX Controller",
+    "REV": "A"
+  }
+}
